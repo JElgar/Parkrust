@@ -2,9 +2,7 @@ use chrono::{DateTime, Duration, Utc};
 use reqwest::{Method, RequestBuilder, Url};
 use std::collections::HashMap;
 
-use crate::models::parkrun::{
-    Athlete, AuthResponse, Event, ListAthletes, ListEvents, ListResponse, ListResults, RunResult
-};
+use crate::models::parkrun::AuthResponse;
 
 pub struct Token {
     access_token: String,
@@ -84,11 +82,6 @@ impl AuthenticatedParkrunClient {
             .query(&[("access_token", self.token.access_token.clone())])
     }
 
-    // pub async fn send_list_request<T>(&self, inital_request: RequestBuilder) -> Result<Vec<T>, Box<dyn std::error::Error>> {
-    //     let mut response = inital_request.send().await?.json::<ListResponse<T>>().await?;
-    //     return Ok(response.data.results);
-    // }
-
     // pub async fn get_me(&self) -> Result<Athlete, Box<dyn std::error::Error>> {
     //     let athletes = self
     //         .request(Method::GET, "/v1/me")
@@ -100,37 +93,4 @@ impl AuthenticatedParkrunClient {
     //         .athletes;
     //     Ok(athletes.get(0).unwrap().clone())
     // }
-
-    // pub async fn get_events(
-    //     &self,
-    //     athlete_id: &str,
-    // ) -> Result<Vec<Event>, Box<dyn std::error::Error>> {
-    //     Ok(self
-    //         .request(Method::GET, "/v1/events")
-    //         .query(&[("athlete_id", athlete_id)])
-    //         .send()
-    //         .await?
-    //         .json::<ListResponse<ListEvents>>()
-    //         .await?
-    //         .data
-    //         .events)
-    // }
-
-    pub async fn get_results(
-        &self,
-        athlete_id: &str,
-    ) -> Result<Vec<RunResult>, Box<dyn std::error::Error>> {
-        Ok(self
-            .request(Method::GET, "/v1/results")
-            .query(&[("athleteId", athlete_id)])
-            .send()
-            .await?
-            .json::<ListResponse<ListResults>>()
-            .await?
-            .data
-            .results)
-    }
-
-    // pub async fn get_this_weeks_result()
-    //     EventDate=20140308
 }

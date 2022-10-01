@@ -1,5 +1,7 @@
 use parkrust::client::ParkrunClient;
-use parkrust::models::parkrun::{RunResult, Listable, ResultsQuery};
+use parkrust::models::parkrun::{RunResult, Listable, ResultsQuery, Event, EventsQuery};
+use parkrust::cli::{Cli, Command};
+use clap::Parser;
 
 /// TODO
 /// [ ] Write macro to add serialization to fields
@@ -7,12 +9,22 @@ use parkrust::models::parkrun::{RunResult, Listable, ResultsQuery};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = ParkrunClient::new()
-        .authenticate("", "")
-        .await?;
-    // println!("{:?}", client.get_me().await?);
 
-    println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: String::from("718005") }, client).await?);
+     let args = Cli::parse();
+
+     match &args.command {
+        Command::Run{ id, password } => {
+            let client = ParkrunClient::new()
+                .authenticate(id, password)
+                .await?;
+
+            // println!("{:?}", client.get_me().await?);
+
+            println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await?);
+            println!("{:?}", Event::list(EventsQuery{ athlete_id: id.clone() }, &client).await?);
+        },
+     }
+
 
     // println!("{:?}", client.get_events("718005").await?);
     Ok(())

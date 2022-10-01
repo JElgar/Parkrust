@@ -7,7 +7,7 @@ use crate::client::AuthenticatedParkrunClient;
 
 #[async_trait]
 pub trait Listable<Args> {
-    async fn list(args: Args, parkrun_client: AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error>> where Self:Sized;
+    async fn list(args: Args, parkrun_client: &AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error>> where Self:Sized;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -42,17 +42,12 @@ pub struct ListAthletes {
     pub athletes: Vec<Athlete>,
 }
 
-#[parkrun_model()]
-pub struct ListEvents {
-    pub events: Vec<Event>,
+pub struct EventsQuery {
+    pub athlete_id: String
 }
 
 #[parkrun_model()]
-pub struct ListResults {
-    pub results: Vec<RunResult>,
-}
-
-#[parkrun_model()]
+#[parkrun_list(endpoint="/v1/events", args_type="EventsQuery", data_key="events")]
 pub struct Event {
     event_number: String,
     event_name: String,

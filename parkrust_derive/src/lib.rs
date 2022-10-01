@@ -69,7 +69,7 @@ fn impl_parkrun_list(ast: ItemStruct, args: ParkrunListArgs) -> TokenStream {
 
         #[async_trait]
         impl Listable<#args_type> for #name {
-            async fn list(args: #args_type, parkrun_client: AuthenticatedParkrunClient) -> Result<Vec<#name>, Box<dyn std::error::Error>> {
+            async fn list(args: #args_type, parkrun_client: &AuthenticatedParkrunClient) -> Result<Vec<#name>, Box<dyn std::error::Error>> {
                 let response = parkrun_client
                     .request(reqwest::Method::GET, #endpoint)
                     .query(&[("athleteId", args.athlete_id)])
