@@ -1,13 +1,14 @@
+use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use async_trait::async_trait;
 
-use parkrust_derive::{parkrun_model, parkrun_list};
+use parkrust_derive::{parkrun_model, parkrun_list, parkrun_request_args};
 
 use crate::client::AuthenticatedParkrunClient;
 
-#[async_trait]
-pub trait Listable<Args> {
-    async fn list(args: Args, parkrun_client: &AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error>> where Self:Sized;
+#[async_trait(?Send)]
+pub trait Listable<Args: Serialize + Send> {
+    async fn list(args: Args, parkrun_client: &AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error + Send + Sync>> where Self:Sized;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -42,6 +43,7 @@ pub struct ListAthletes {
     pub athletes: Vec<Athlete>,
 }
 
+#[parkrun_request_args()]
 pub struct EventsQuery {
     pub athlete_id: String
 }
@@ -67,6 +69,7 @@ pub struct Event {
     accessible_to_public: String,
 }
 
+#[parkrun_request_args()]
 pub struct ResultsQuery {
     pub athlete_id: String
 }
@@ -76,7 +79,7 @@ pub struct ResultsQuery {
 pub struct RunResult {
     #[serde(rename(serialize = "SeriesID", deserialize = "SeriesID"))]
     pub series_id: String, // Int
-    event_number: String, // Int
+    pub event_number: String, // Int
     pub run_id: String, // Int
     pub finish_position: String, // Int
     pub gender_position: String, // Int,

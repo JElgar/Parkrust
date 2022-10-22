@@ -4,27 +4,38 @@ use std::collections::HashMap;
 
 use crate::models::parkrun::AuthResponse;
 
+#[derive(Clone, PartialEq)]
 pub struct Token {
-    access_token: String,
-    refresh_token: String,
-    expires_at: DateTime<Utc>,
+    pub access_token: String,
+    pub refresh_token: String,
+    pub expires_at: DateTime<Utc>,
 }
 
 pub struct ParkrunClient {
-    base_url: Url,
-    request_client: reqwest::Client,
+    pub base_url: Url,
+    pub request_client: reqwest::Client,
 }
 
 pub struct AuthenticatedParkrunClient {
-    base_url: Url,
-    request_client: reqwest::Client,
-    token: Token,
+    pub base_url: Url,
+    pub request_client: reqwest::Client,
+    pub token: Token,
+}
+
+#[cfg(target_arch = "wasm32")]
+fn get_base_url() -> Url {
+    Url::parse("https://parkrun-proxy.x2.workers.dev/").unwrap()
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn get_base_url() -> Url {
+    Url::parse("https://api.parkrun.com").unwrap()
 }
 
 impl ParkrunClient {
     pub fn new() -> Self {
         return ParkrunClient {
-            base_url: Url::parse("https://api.parkrun.com").unwrap(),
+            base_url: get_base_url(), 
             request_client: reqwest::Client::builder().build().unwrap(),
         };
     }
@@ -52,6 +63,7 @@ impl ParkrunClient {
             ("grant_type", "password"),
         ]);
 
+        // TODO Handle possible errors here
         let response = self
             .request(Method::POST, "/user_auth.php")
             .form(&body)
@@ -74,6 +86,14 @@ impl ParkrunClient {
 }
 
 impl AuthenticatedParkrunClient {
+    pub fn new(token: Token) -> Self {
+        return AuthenticatedParkrunClient {
+            base_url: get_base_url(), 
+            request_client: reqwest::Client::builder().build().unwrap(),
+            token,
+        };
+    }
+
     pub fn request(&self, method: Method, path: &str) -> RequestBuilder {
         let request_url = self.base_url.join(path).unwrap();
         self.request_client

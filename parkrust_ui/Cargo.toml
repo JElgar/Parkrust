@@ -1,0 +1,15 @@
+[package]
+name = "parkrust_ui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+parkrust = { path = "../parkrust" }
+parkrust_ui_derive = { path = "./parkrust_ui_derive" }
+
+yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
+yew-router = { git = "https://github.com/yewstack/yew.git" }
+wasm-bindgen-futures = "0.4.33"
+material-yew = { version = "0.2", features = ["full"] }
+web-sys = "0.3.60"
+gloo = "0.8.0"

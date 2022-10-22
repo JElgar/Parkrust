@@ -1,11 +1,10 @@
+mod cli;
+
 use parkrust::client::ParkrunClient;
 use parkrust::models::parkrun::{RunResult, Listable, ResultsQuery, Event, EventsQuery};
-use parkrust::cli::{Cli, Command};
-use clap::Parser;
 
-/// TODO
-/// [ ] Write macro to add serialization to fields
-/// [ ] Write macro to generate requests from endpoints + types
+use cli::{Cli, Command};
+use clap::Parser;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,11 +19,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // println!("{:?}", client.get_me().await?);
 
-            println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await?);
-            println!("{:?}", Event::list(EventsQuery{ athlete_id: id.clone() }, &client).await?);
+            RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap();
+            println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap());
+            // println!("{:?}", Event::list(EventsQuery{ athlete_id: id.clone() }, &client).await?);
         },
      }
-
 
     // println!("{:?}", client.get_events("718005").await?);
     Ok(())
