@@ -13,3 +13,4 @@ wasm-bindgen-futures = "0.4.33"
 material-yew = { version = "0.2", features = ["full"] }
 web-sys = "0.3.60"
 gloo = "0.8.0"
+chrono = "0.4"
