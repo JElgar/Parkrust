@@ -1,20 +1,39 @@
 use parkrust::models::parkrun::{RunResult, ResultsQuery, Listable};
 use parkrust::client::{ParkrunClient, AuthenticatedParkrunClient, Token};
+use parkrust_ui_derive::table_data_type;
 
 use yew::prelude::*;
 use yew_router::{BrowserRouter, Routable, Switch}; 
 use material_yew::{MatTextField, MatButton};
 
+use crate::components::Table;
+use crate::components::table::TableDataType;
 use crate::{
     utils::router::Route,
     routes::login::Login,
     services::parkrun::{AuthContext, AuthState},
 };
 
+#[table_data_type()]
+pub struct ResultTableData {
+    date: String,
+    time: String
+}
+
+impl ResultTableData {
+    pub fn from_parkrun_result(RunResult { event_date, run_time, .. }: &RunResult) -> Self {
+        ResultTableData {
+            date: event_date.clone(),
+            time: run_time.clone(),
+        }
+    }
+}
+
 #[function_component(Results)]
 pub fn results() -> Html {
     let results = use_state(|| vec![]);
     let auth_ctx = use_context::<AuthContext>().unwrap();
+    let table_data = results.iter().map(|result| ResultTableData::from_parkrun_result(result)).collect::<Vec<ResultTableData>>();
 
     let id = "";
     // let password = "";
@@ -37,29 +56,6 @@ pub fn results() -> Html {
     }
 
     html! {
-        <table class="table-auto">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th>{"Date"}</th>
-                <th>{"Time"}</th>
-              </tr>
-            </thead>
-            <tbody>
-                { 
-                    results.iter().map(|result| {
-                        html!{
-                            <tr key={result.run_id.clone()} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <td>
-                                    { result.event_date.clone() }
-                                </td>
-                                <td>
-                                    { result.run_time.clone() }
-                                </td>
-                            </tr>
-                        }
-                    }).collect::<Html>()
-                }
-            </tbody>
-        </table>
+        <Table<ResultTableData> data={table_data} />
     }
 }

@@ -20,23 +20,16 @@ fn impl_table_data_type(struct_: ItemStruct) -> TokenStream {
     let header_strings: Vec<String> = header_idents.clone().iter().map(|ident| ident.to_string()).collect();
 
     quote! {
+        #[derive(PartialEq)]
         #struct_
 
-        impl TableDataType for #name {
-            fn get_headers() -> Vec<&'static str> {
+        impl crate::components::table::TableDataType for #name {
+            fn get_headers() -> Vec<crate::components::table::TableHeaderData> {
                 vec![#( #header_strings ),*]
             }
             
-            fn get_row(&self) -> Html {
-                html! {
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        #(
-                            <td>
-                                { self.#header_idents.clone() }
-                            </td>
-                        )*
-                    </tr>
-                }
+            fn get_row(&self) -> Vec<crate::components::table::TableCellData> {
+                vec![#( self.#header_idents.clone() ),*]
             }
         } 
     }.into()
