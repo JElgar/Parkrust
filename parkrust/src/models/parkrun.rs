@@ -12,7 +12,7 @@ use parse_duration::parse;
 
 #[async_trait(?Send)]
 pub trait Listable<Args: Serialize + Send> {
-    async fn list(args: Args, parkrun_client: &AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error + Send + Sync>> where Self:Sized;
+    async fn list(args: Args, parkrun_client: &mut AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error + Send + Sync>> where Self:Sized;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -20,6 +20,12 @@ pub struct AuthResponse {
     pub access_token: String,
     pub refresh_token: String,
     pub expires_in: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RefreshTokenResponse {
+    pub access_token: String,
+    pub expires_in: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

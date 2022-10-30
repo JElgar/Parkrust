@@ -14,13 +14,9 @@ use parkrust_ui::{
     routes::{
         login::Login,
         results::Results,
+        home::Home,
     }
 };
-
-#[function_component(Home)]
-pub fn home() -> Html {
-    html! { <h1>{ "Loading..." }</h1> }
-}
 
 fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
     // TODO this doesnt work because 404s cant be handled
@@ -31,7 +27,7 @@ fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
         // Redirect when trying to access any other route
         (_, None) => html! { <Redirect<Route> to={Route::Login} /> },
         // Authenticated Routes
-        (Route::Home, _) => html! { <h1>{ "Home" }</h1> },
+        (Route::Home, _) => html! { <Home /> },
         (Route::Results, _) => html! { <Results /> },
         (Route::NotFound, _) => html! { <h1>{ "404" }</h1> },
     }

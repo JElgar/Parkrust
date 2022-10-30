@@ -1,8 +1,8 @@
 use chrono::{DateTime, Duration, Utc};
-use reqwest::{Method, RequestBuilder, Url};
+use reqwest::{Method, RequestBuilder, Url, Response};
 use std::collections::HashMap;
 
-use crate::models::parkrun::AuthResponse;
+use crate::models::parkrun::{AuthResponse, RefreshTokenResponse};
 
 pub mod requests;
 
@@ -34,10 +34,24 @@ fn get_base_url() -> Url {
     Url::parse("https://api.parkrun.com").unwrap()
 }
 
+impl Token {
+    pub fn from_auth_response(response: AuthResponse) -> Self {
+        Token {
+            access_token: response.access_token,
+            refresh_token: response.refresh_token,
+            expires_at: Utc::now() + Duration::seconds(response.expires_in.parse().unwrap()),
+        }
+    }
+
+    pub fn is_expired(&self) -> bool {
+        self.expires_at.timestamp() <= Utc::now().timestamp()
+    }
+}
+
 impl ParkrunClient {
     pub fn new() -> Self {
         return ParkrunClient {
-            base_url: get_base_url(), 
+            base_url: get_base_url(),
             request_client: reqwest::Client::builder().build().unwrap(),
         };
     }
@@ -78,11 +92,30 @@ impl ParkrunClient {
         Ok(AuthenticatedParkrunClient {
             base_url: self.base_url,
             request_client: self.request_client,
-            token: Token {
-                access_token: response.access_token,
-                refresh_token: response.refresh_token,
-                expires_at: Utc::now() + Duration::seconds(response.expires_in.parse().unwrap()),
-            },
+            token: Token::from_auth_response(response),
+        })
+    }
+    
+    pub async fn refresh_token(&mut self, refresh_token: &str) -> Result<Token, Box<dyn std::error::Error>> {
+        let body = HashMap::from([
+            ("refresh_token", refresh_token),
+            ("grant_type", "refresh_token"),
+        ]);
+
+        let response = self
+            .request(Method::POST, "/auth/refresh")
+            .form(&body)
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .send()
+            .await?
+            .json::<RefreshTokenResponse>()
+            .await?;
+
+        println!("Refresh token response is: {:?}", response);
+        Ok(Token{
+            expires_at: Utc::now() + Duration::seconds(response.expires_in.into()),
+            access_token: response.access_token,
+            refresh_token: String::from(refresh_token),
         })
     }
 }
@@ -90,7 +123,7 @@ impl ParkrunClient {
 impl AuthenticatedParkrunClient {
     pub fn new(token: Token) -> Self {
         return AuthenticatedParkrunClient {
-            base_url: get_base_url(), 
+            base_url: get_base_url(),
             request_client: reqwest::Client::builder().build().unwrap(),
             token,
         };
@@ -102,6 +135,21 @@ impl AuthenticatedParkrunClient {
             .request(method, request_url)
             .header("X-Powered-By", "Park Rust")
             .query(&[("access_token", self.token.access_token.clone())])
+    }
+
+    pub async fn send_request_with_refresh(&mut self, request: RequestBuilder) -> Result<Response, reqwest::Error>{
+        if self.token.is_expired() {
+            self.refresh_token().await.expect("Failed to refresh token");
+        }
+
+        Ok(request.send().await?)
+    }
+
+    pub async fn refresh_token(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        self.token = ParkrunClient::new()
+            .refresh_token(&self.token.refresh_token)
+            .await?;
+        Ok(())
     }
 
     // pub async fn get_me(&self) -> Result<Athlete, Box<dyn std::error::Error>> {

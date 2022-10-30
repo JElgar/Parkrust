@@ -64,13 +64,14 @@ fn impl_parkrun_list(ast: ItemStruct, args: ParkrunListArgs) -> TokenStream {
 
         #[async_trait(?Send)]
         impl Listable<#args_type> for #name {
-            async fn list(args: #args_type, parkrun_client: &AuthenticatedParkrunClient) -> Result<Vec<#name>, Box<dyn std::error::Error + Send + Sync>> {
+            async fn list(args: #args_type, parkrun_client: &mut AuthenticatedParkrunClient) -> Result<Vec<#name>, Box<dyn std::error::Error + Send + Sync>> {
 
                 // Make list call with params
-                let mut response = parkrun_client
+                let request = parkrun_client
                     .request(reqwest::Method::GET, #endpoint)
-                    .query(&args)
-                    .send()
+                    .query(&args);
+
+                let mut response = parkrun_client.send_request_with_refresh(request)
                     .await?
                     .json::<ListResponse<#list_response_ident>>()
                     .await?;
@@ -87,8 +88,8 @@ fn impl_parkrun_list(ast: ItemStruct, args: ParkrunListArgs) -> TokenStream {
                     }
                 }) {
                     // Update the response with the next page response
-                    response = parkrun_client.request(reqwest::Method::GET, &next_page.as_str()[2..])
-                        .send()
+                    let request = parkrun_client.request(reqwest::Method::GET, &next_page.as_str()[2..]);
+                    response = parkrun_client.send_request_with_refresh(request)
                         .await?
                         .json::<ListResponse<#list_response_ident>>()
                         .await?;
