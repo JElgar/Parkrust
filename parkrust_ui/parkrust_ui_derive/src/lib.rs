@@ -1,10 +1,9 @@
-use darling::FromMeta;
-use proc_macro::{Span, TokenStream};
+use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, parse_macro_input, AttributeArgs, Ident, ItemStruct, Fields, FieldsNamed};
+use syn::{self, parse_macro_input, Ident, ItemStruct, Fields, FieldsNamed};
 
 #[proc_macro_attribute]
-pub fn table_data_type(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn table_data_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(item as ItemStruct);
     impl_table_data_type(ast)
 }

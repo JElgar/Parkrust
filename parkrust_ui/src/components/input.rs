@@ -1,8 +1,6 @@
 use yew::prelude::*;
 use yew::virtual_dom::AttrValue;
 
-use web_sys::HtmlInputElement;
-
 /// The `TextFieldType` type
 #[derive(Debug, Clone, PartialEq)]
 pub enum TextFieldType {
@@ -55,8 +53,18 @@ pub struct InputProps {
 }
 
 #[function_component(Input)]
-pub fn input(InputProps{ id, name, label, field_type, auto_complete, required, placeholder, onchange }: &InputProps) -> Html {
-
+pub fn input(
+    InputProps {
+        id,
+        name,
+        label,
+        field_type,
+        auto_complete,
+        required,
+        placeholder,
+        onchange,
+    }: &InputProps,
+) -> Html {
     html! {
         <div>
             <label htmlFor={id.clone()} class="sr-only">

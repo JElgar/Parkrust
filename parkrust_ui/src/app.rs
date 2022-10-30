@@ -1,21 +1,13 @@
-use std::rc::Rc;
-
-use parkrust::models::parkrun::{RunResult, ResultsQuery, Listable};
-use parkrust::client::{ParkrunClient, AuthenticatedParkrunClient, Token};
-
-use parkrust_ui::services::parkrun::{AuthContext, AuthState, get_auth_data_from_local_storage, AuthData};
+use parkrust_ui::services::parkrun::{
+    get_auth_data_from_local_storage, AuthContext, AuthData, AuthState,
+};
 use yew::prelude::*;
 use yew_router::prelude::Redirect;
-use yew_router::{BrowserRouter, Routable, Switch}; 
-use material_yew::{MatTextField, MatButton};
+use yew_router::{BrowserRouter, Switch};
 
 use parkrust_ui::{
+    routes::{home::Home, login::Login, results::Results},
     utils::router::Route,
-    routes::{
-        login::Login,
-        results::Results,
-        home::Home,
-    }
 };
 
 fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
@@ -35,7 +27,10 @@ fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
 
 #[function_component(App)]
 pub fn app() -> Html {
-    let auth_state = use_reducer(|| AuthState { data: get_auth_data_from_local_storage(), results_cache: None });
+    let auth_state = use_reducer(|| AuthState {
+        data: get_auth_data_from_local_storage(),
+        results_cache: None,
+    });
     html! {
         <ContextProvider<AuthContext> context={auth_state}>
             <Router />

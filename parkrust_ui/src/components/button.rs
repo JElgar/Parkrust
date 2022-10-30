@@ -9,7 +9,7 @@ pub struct ButtonProps {
 }
 
 #[function_component(Button)]
-pub fn button(ButtonProps{ text, onclick }: &ButtonProps) -> Html {
+pub fn button(ButtonProps { text, onclick }: &ButtonProps) -> Html {
     html! {
         <button
             onclick={onclick}

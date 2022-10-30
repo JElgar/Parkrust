@@ -1,5 +1,4 @@
-use yew::prelude::*;
-use yew_router::{BrowserRouter, Routable, Switch}; 
+use yew_router::Routable;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {

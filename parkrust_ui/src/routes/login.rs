@@ -1,11 +1,14 @@
-use parkrust::{client::{Token, ParkrunClient}, models::parkrun::Athlete};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use web_sys::HtmlInputElement;
 use gloo::console::log;
+use web_sys::HtmlInputElement;
 
-use crate::{components::{Button, Input, TextFieldType}, services::parkrun::{login, AuthContext, AuthAction, AuthData }, utils::router::Route};
+use crate::{
+    components::{Button, Input, TextFieldType},
+    services::parkrun::{login, AuthAction, AuthContext, AuthData},
+    utils::router::Route,
+};
 
 #[function_component(Login)]
 pub fn login_view() -> Html {
@@ -22,7 +25,7 @@ pub fn login_view() -> Html {
             let athlete_id = athlete_id.clone();
             let password = password.clone();
             let auth_ctx = auth_ctx.clone();
-            let navigator = navigator.clone(); 
+            let navigator = navigator.clone();
             wasm_bindgen_futures::spawn_local(async move {
                 // let client = ParkrunClient::new()
                 //     .authenticate("", "")
@@ -31,7 +34,10 @@ pub fn login_view() -> Html {
                 // login("", "").await;
                 let athlete_id = (*athlete_id).as_str();
                 let token = login(athlete_id, (*password).as_str()).await;
-                auth_ctx.dispatch(AuthAction::Login(AuthData{ token, athlete_id: athlete_id.to_string() }));
+                auth_ctx.dispatch(AuthAction::Login(AuthData {
+                    token,
+                    athlete_id: athlete_id.to_string(),
+                }));
                 navigator.push(&Route::Home)
             });
         })
