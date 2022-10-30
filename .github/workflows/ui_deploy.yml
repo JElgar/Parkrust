@@ -1,9 +1,13 @@
-name: Deploy
+name: UI Deploy
 on:
   workflow_run:
     branches: [main]
-    workflows: [Test]
+    workflows: [UI Test]
     types: [completed]
+
+defaults:
+  run:
+    working-directory: parkrust_ui
 
 jobs:
   release:
