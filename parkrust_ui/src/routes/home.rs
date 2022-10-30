@@ -11,7 +11,7 @@ pub struct StatCardProps {
 #[function_component(StatCard)]
 pub fn stat_card(StatCardProps { value, title }: &StatCardProps) -> Html {
     html! {
-        <div class="transform sm:col-span-3 col-span-6">
+        <div class="transform col-span-6 lg:col-span-3">
             <Card>
                 <div class="w-full">
                    <div class="mt-3 text-3xl font-bold leading-8"> { value } </div>
