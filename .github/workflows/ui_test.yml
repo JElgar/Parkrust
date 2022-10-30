@@ -35,6 +35,8 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: nightly 
+        override: true
+        components: clippy
     - run: cargo --version 
-    - run: clippy --version 
+    - run: cargo clippy --version 
     - run: cargo clippy --all -- -D warnings
