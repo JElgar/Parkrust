@@ -12,6 +12,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly 
     - run: cargo test --all
 
   format:
@@ -19,6 +22,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly 
     - run: cargo fmt --all -- --check
 
   clippy:
@@ -26,4 +32,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly 
     - run: cargo clippy --all -- -D warnings
