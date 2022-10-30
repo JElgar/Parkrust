@@ -1,10 +1,14 @@
+use chrono::Duration;
 use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use async_trait::async_trait;
+use std::time::Duration as StdDuration;
 
 use parkrust_derive::{parkrun_model, parkrun_list, parkrun_request_args};
+use serde_json::from_str;
 
 use crate::client::AuthenticatedParkrunClient;
+use parse_duration::parse;
 
 #[async_trait(?Send)]
 pub trait Listable<Args: Serialize + Send> {
@@ -95,4 +99,15 @@ pub struct RunResult {
     pub genuine_pb: String, // Boolean
     pub updated: String, // Date time
     pub assisted: Option<bool> // Not sure?
+}
+
+impl RunResult {
+    pub fn duration(&self) -> Duration {
+        let duration_splits = self.run_time.split(":").collect::<Vec<&str>>();
+        let mins: u32 = from_str(duration_splits.get(1).unwrap()).unwrap_or(0);
+        let seconds: u32 = from_str(duration_splits.get(2).unwrap()).unwrap_or(0);
+
+        let duration = StdDuration::new((seconds + mins * 60).into(), 0);
+        Duration::from_std(duration).unwrap()
+    }
 }

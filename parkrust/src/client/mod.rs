@@ -4,6 +4,8 @@ use std::collections::HashMap;
 
 use crate::models::parkrun::AuthResponse;
 
+pub mod requests;
+
 #[derive(Clone, PartialEq)]
 pub struct Token {
     pub access_token: String,

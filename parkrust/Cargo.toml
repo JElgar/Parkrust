@@ -17,3 +17,4 @@ serde_json = "1.0"
 
 chrono = "0.4"
 clap = { version = "4.0.7", features = ["derive"] }
+parse_duration = "2.1.1"

@@ -1,6 +1,7 @@
 mod cli;
 
 use parkrust::client::ParkrunClient;
+use parkrust::client::requests::{total_time, average_time};
 use parkrust::models::parkrun::{RunResult, Listable, ResultsQuery, Event, EventsQuery};
 
 use cli::{Cli, Command};
@@ -19,8 +20,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // println!("{:?}", client.get_me().await?);
 
-            RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap();
-            println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap());
+            // RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap();
+            // println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap());
+            println!("Total time: {:?}", total_time(&client, &id).await);
+            println!("Average time: {:?}", average_time(&client, &id).await);
             // println!("{:?}", Event::list(EventsQuery{ athlete_id: id.clone() }, &client).await?);
         },
      }
