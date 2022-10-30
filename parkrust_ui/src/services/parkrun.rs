@@ -1,5 +1,5 @@
 use gloo::{storage::{LocalStorage, Storage, errors::StorageError}, console::log};
-use parkrust::client::{AuthenticatedParkrunClient, ParkrunClient, Token};
+use parkrust::{client::{AuthenticatedParkrunClient, ParkrunClient, Token}, models::parkrun::{RunResult, Listable, ResultsQuery}};
 use std::rc::Rc;
 use yew::prelude::*;
 use chrono::prelude::*;
@@ -18,11 +18,13 @@ pub struct AuthData {
 #[derive(Default, Clone, PartialEq)]
 pub struct AuthState {
     pub data: Option<AuthData>,
+    pub results_cache: Option<Vec<RunResult>>
 }
 
 pub enum AuthAction {
     Login(AuthData),
     Refresh(Token),
+    CacheResults(Vec<RunResult>),
 }
 
 pub type AuthContext = UseReducerHandle<AuthState>;
@@ -41,8 +43,28 @@ pub type AuthContext = UseReducerHandle<AuthState>;
 //     };
 // }
 
-pub async fn get_client(auth_ctx: UseReducerHandle<AuthState>) -> Option<AuthenticatedParkrunClient> {
-    let mut token = auth_ctx.clone().data.clone()?.token;
+
+#[hook]
+pub fn use_results() -> UseStateHandle<Option<Vec<RunResult>>> {
+    let results = use_state(|| None);
+    let auth_ctx = use_context::<AuthContext>().unwrap();
+
+    {
+        let results = results.clone();
+        println!("Getting stuff");
+        use_effect_with_deps(move |_| {
+            wasm_bindgen_futures::spawn_local(async move {
+                results.set(Some(get_user_results(&auth_ctx).await));
+            });
+            || ()
+        }, ());
+    }
+
+    results
+}
+
+pub async fn get_client(auth_ctx: &UseReducerHandle<AuthState>) -> Option<AuthenticatedParkrunClient> {
+    let mut token = auth_ctx.data.clone()?.token;
     if token.is_expired() {
         log!("Token is expired");
         log!("{:?}", token.expires_at.to_string());
@@ -55,6 +77,18 @@ pub async fn get_client(auth_ctx: UseReducerHandle<AuthState>) -> Option<Authent
     Some(AuthenticatedParkrunClient::new(token))
 }
 
+pub async fn get_user_results(auth_ctx: &UseReducerHandle<AuthState>) -> Vec<RunResult> {
+    let athlete_id = auth_ctx.data.as_ref().unwrap().athlete_id.clone();
+    if let Some(results) = &auth_ctx.results_cache {
+        return results.to_vec();
+    }
+
+    let mut client = get_client(auth_ctx).await.unwrap();
+    let results = RunResult::list(ResultsQuery{ athlete_id }, &mut client).await.unwrap();
+    auth_ctx.dispatch(AuthAction::CacheResults(results.clone()));
+    results
+}
+
 impl Reducible for AuthState {
     /// Reducer Action Type
     type Action = AuthAction;
@@ -65,13 +99,16 @@ impl Reducible for AuthState {
             AuthAction::Login(auth_data) => {
                 store_token_data(&auth_data.token).unwrap();
                 store_althlete_id(&auth_data.athlete_id).unwrap();
-                // store_token_data(&auth_data.token).unwrap_or(log!("Failed to store token data"));
-                // store_althlete_id(&auth_data.athlete_id).unwrap_or(log!("Failed to store athlete id"));
-                Self { data: Some(auth_data) }.into()
+                Self { data: Some(auth_data), results_cache: None }.into()
             },
             AuthAction::Refresh(token) => {
                 let athlete_id = &self.data.as_ref().unwrap().athlete_id;
-                Self { data: Some(AuthData { athlete_id: String::from(athlete_id), token }) }.into()
+                let results_cache = self.results_cache.clone();
+                Self { data: Some(AuthData { athlete_id: String::from(athlete_id), token }), results_cache }.into()
+            },
+            AuthAction::CacheResults(results) => {
+                let auth_data = self.data.clone();
+                Self { data: auth_data, results_cache: Some(results) }.into()
             }
         }
     }

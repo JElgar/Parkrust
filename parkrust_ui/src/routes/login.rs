@@ -32,7 +32,7 @@ pub fn login_view() -> Html {
                 let athlete_id = (*athlete_id).as_str();
                 let token = login(athlete_id, (*password).as_str()).await;
                 auth_ctx.dispatch(AuthAction::Login(AuthData{ token, athlete_id: athlete_id.to_string() }));
-                navigator.push(&Route::Results)
+                navigator.push(&Route::Home)
             });
         })
     };

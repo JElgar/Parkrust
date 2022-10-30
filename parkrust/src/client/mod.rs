@@ -68,10 +68,13 @@ impl ParkrunClient {
 
     pub async fn authenticate(
         self,
-        athlete_id: &str,
+        mut athlete_id: &str,
         password: &str,
     ) -> Result<AuthenticatedParkrunClient, Box<dyn std::error::Error>> {
-        // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        if athlete_id.starts_with("A") || athlete_id.starts_with("a") {
+            athlete_id = &athlete_id[1..athlete_id.len()]
+        }
+        
         let body = HashMap::from([
             ("username", athlete_id),
             ("password", password),

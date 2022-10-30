@@ -8,7 +8,7 @@ use material_yew::{MatTextField, MatButton};
 
 use crate::components::Table;
 use crate::components::table::TableDataType;
-use crate::services::parkrun::get_client;
+use crate::services::parkrun::{get_client, get_user_results, use_results};
 use crate::{
     utils::router::Route,
     routes::login::Login,
@@ -32,26 +32,19 @@ impl ResultTableData {
 
 #[function_component(Results)]
 pub fn results() -> Html {
-    let results = use_state(|| vec![]);
-    let auth_ctx = use_context::<AuthContext>().unwrap();
-    let table_data = results.iter().map(|result| ResultTableData::from_parkrun_result(result)).collect::<Vec<ResultTableData>>();
+    let results_state = use_results();
 
-    {
-        let results = results.clone();
-        println!("Getting stuff");
-        use_effect_with_deps(move |_| {
-            wasm_bindgen_futures::spawn_local(async move {
-                let auth_data = auth_ctx.data.clone().unwrap();
-                let mut client = get_client(auth_ctx).await.unwrap();
-                let response: Vec<RunResult> = RunResult::list(ResultsQuery{ athlete_id: auth_data.athlete_id }, &mut client).await.unwrap();
-
-                results.set(response);
-            });
-            || ()
-        }, ());
-    }
-
-    html! {
-        <Table<ResultTableData> data={table_data} />
+    match &*results_state {
+        Some(results) => {
+            let table_data = results.iter().map(|result| ResultTableData::from_parkrun_result(result)).collect::<Vec<ResultTableData>>();
+            html! {
+                <Table<ResultTableData> data={table_data} />
+            }
+        },
+        None => {
+            html! {
+                <div> { "Loading..." } </div> 
+            }
+        }
     }
 }

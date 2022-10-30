@@ -35,7 +35,7 @@ fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
 
 #[function_component(App)]
 pub fn app() -> Html {
-    let auth_state = use_reducer(|| AuthState { data: get_auth_data_from_local_storage() });
+    let auth_state = use_reducer(|| AuthState { data: get_auth_data_from_local_storage(), results_cache: None });
     html! {
         <ContextProvider<AuthContext> context={auth_state}>
             <Router />

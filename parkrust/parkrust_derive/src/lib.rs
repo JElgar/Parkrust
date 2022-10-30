@@ -8,7 +8,7 @@ pub fn parkrun_model(_: TokenStream, item: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(item as ItemStruct);
 
     quote! {
-        #[derive(Serialize, Deserialize, Debug, Clone)]
+        #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
         #[serde(rename_all = "PascalCase")]
         #ast
     }
@@ -55,7 +55,6 @@ fn impl_parkrun_list(ast: ItemStruct, args: ParkrunListArgs) -> TokenStream {
     let data_key = &args.data_key;
 
     let list_response_ident = Ident::new(format!("List{}Response", name).as_str(), name.span());
-
     let list_def = quote! {
         #[parkrun_model()]
         struct #list_response_ident {
