@@ -1,5 +1,5 @@
 use darling::FromMeta;
-use proc_macro::{Span, TokenStream};
+use proc_macro::TokenStream;
 use quote::quote;
 use syn::{self, parse_macro_input, AttributeArgs, Ident, ItemStruct};
 
@@ -93,7 +93,7 @@ fn impl_parkrun_list(ast: ItemStruct, args: ParkrunListArgs) -> TokenStream {
                         .json::<ListResponse<#list_response_ident>>()
                         .await?;
 
-                    // And push the items to the output list 
+                    // And push the items to the output list
                     items.extend(response.data.#data_key);
                 }
 

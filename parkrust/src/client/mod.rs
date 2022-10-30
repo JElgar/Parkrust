@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use reqwest::{Method, RequestBuilder, Url, Response};
+use reqwest::{Method, RequestBuilder, Response, Url};
 use std::collections::HashMap;
 
 use crate::models::parkrun::{AuthResponse, RefreshTokenResponse};
@@ -48,12 +48,18 @@ impl Token {
     }
 }
 
+impl Default for ParkrunClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ParkrunClient {
     pub fn new() -> Self {
-        return ParkrunClient {
+        ParkrunClient {
             base_url: get_base_url(),
             request_client: reqwest::Client::builder().build().unwrap(),
-        };
+        }
     }
 
     pub fn request(&self, method: Method, path: &str) -> RequestBuilder {
@@ -71,10 +77,10 @@ impl ParkrunClient {
         mut athlete_id: &str,
         password: &str,
     ) -> Result<AuthenticatedParkrunClient, Box<dyn std::error::Error>> {
-        if athlete_id.starts_with("A") || athlete_id.starts_with("a") {
+        if athlete_id.starts_with('A') || athlete_id.starts_with('a') {
             athlete_id = &athlete_id[1..athlete_id.len()]
         }
-        
+
         let body = HashMap::from([
             ("username", athlete_id),
             ("password", password),
@@ -98,8 +104,11 @@ impl ParkrunClient {
             token: Token::from_auth_response(response),
         })
     }
-    
-    pub async fn refresh_token(&mut self, refresh_token: &str) -> Result<Token, Box<dyn std::error::Error>> {
+
+    pub async fn refresh_token(
+        &mut self,
+        refresh_token: &str,
+    ) -> Result<Token, Box<dyn std::error::Error>> {
         let body = HashMap::from([
             ("refresh_token", refresh_token),
             ("grant_type", "refresh_token"),
@@ -115,7 +124,7 @@ impl ParkrunClient {
             .await?;
 
         println!("Refresh token response is: {:?}", response);
-        Ok(Token{
+        Ok(Token {
             expires_at: Utc::now() + Duration::seconds(response.expires_in.into()),
             access_token: response.access_token,
             refresh_token: String::from(refresh_token),
@@ -125,11 +134,11 @@ impl ParkrunClient {
 
 impl AuthenticatedParkrunClient {
     pub fn new(token: Token) -> Self {
-        return AuthenticatedParkrunClient {
+        AuthenticatedParkrunClient {
             base_url: get_base_url(),
             request_client: reqwest::Client::builder().build().unwrap(),
             token,
-        };
+        }
     }
 
     pub fn request(&self, method: Method, path: &str) -> RequestBuilder {
@@ -140,12 +149,15 @@ impl AuthenticatedParkrunClient {
             .query(&[("access_token", self.token.access_token.clone())])
     }
 
-    pub async fn send_request_with_refresh(&mut self, request: RequestBuilder) -> Result<Response, reqwest::Error>{
+    pub async fn send_request_with_refresh(
+        &mut self,
+        request: RequestBuilder,
+    ) -> Result<Response, reqwest::Error> {
         if self.token.is_expired() {
             self.refresh_token().await.expect("Failed to refresh token");
         }
 
-        Ok(request.send().await?)
+        request.send().await
     }
 
     pub async fn refresh_token(&mut self) -> Result<(), Box<dyn std::error::Error>> {

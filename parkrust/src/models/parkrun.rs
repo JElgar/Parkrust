@@ -1,18 +1,21 @@
-use chrono::Duration;
-use reqwest::RequestBuilder;
-use serde::{Deserialize, Serialize};
 use async_trait::async_trait;
+use chrono::Duration;
+use serde::{Deserialize, Serialize};
 use std::time::Duration as StdDuration;
 
-use parkrust_derive::{parkrun_model, parkrun_list, parkrun_request_args};
+use parkrust_derive::{parkrun_list, parkrun_model, parkrun_request_args};
 use serde_json::from_str;
 
 use crate::client::AuthenticatedParkrunClient;
-use parse_duration::parse;
 
 #[async_trait(?Send)]
 pub trait Listable<Args: Serialize + Send> {
-    async fn list(args: Args, parkrun_client: &mut AuthenticatedParkrunClient) -> Result<Vec<Self>, Box<dyn std::error::Error + Send + Sync>> where Self:Sized;
+    async fn list(
+        args: Args,
+        parkrun_client: &mut AuthenticatedParkrunClient,
+    ) -> Result<Vec<Self>, Box<dyn std::error::Error + Send + Sync>>
+    where
+        Self: Sized;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -37,7 +40,7 @@ pub struct ListResponseLink {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListResponse<T> {
     pub data: T,
-    pub links: Vec<ListResponseLink>
+    pub links: Vec<ListResponseLink>,
 }
 
 #[parkrun_model()]
@@ -55,15 +58,19 @@ pub struct ListAthletes {
 
 #[parkrun_request_args()]
 pub struct EventsQuery {
-    pub athlete_id: String
+    pub athlete_id: String,
 }
 
 #[parkrun_model()]
-#[parkrun_list(endpoint="/v1/events", args_type="EventsQuery", data_key="events")]
+#[parkrun_list(
+    endpoint = "/v1/events",
+    args_type = "EventsQuery",
+    data_key = "events"
+)]
 pub struct Event {
     event_number: String,
     event_name: String,
-    event_short_name: String, 
+    event_short_name: String,
     event_long_name: String,
     event_location: String,
     country_code: String,
@@ -81,35 +88,39 @@ pub struct Event {
 
 #[parkrun_request_args()]
 pub struct ResultsQuery {
-    pub athlete_id: String
+    pub athlete_id: String,
 }
 
 #[parkrun_model()]
-#[parkrun_list(endpoint="/v1/results", args_type="ResultsQuery", data_key="results")]
+#[parkrun_list(
+    endpoint = "/v1/results",
+    args_type = "ResultsQuery",
+    data_key = "results"
+)]
 pub struct RunResult {
     #[serde(rename(serialize = "SeriesID", deserialize = "SeriesID"))]
     pub series_id: String, // Int
-    pub event_number: String, // Int
-    pub run_id: String, // Int
+    pub event_number: String,    // Int
+    pub run_id: String,          // Int
     pub finish_position: String, // Int
     pub gender_position: String, // Int,
-    pub event_date: String, // Date  (2018-03-10)
+    pub event_date: String,      // Date  (2018-03-10)
     #[serde(rename(serialize = "AthleteID", deserialize = "AthleteID"))]
     pub athlete_id: String, // Int
-    pub run_time: String, // Duration
-    pub was_pb_run: String, // Boolean
-    pub age_grading: String, // Float
-    pub age_category: String, // Enum (JM15-17)
-    pub first_timer: String, // Boolean
+    pub run_time: String,        // Duration
+    pub was_pb_run: String,      // Boolean
+    pub age_grading: String,     // Float
+    pub age_category: String,    // Enum (JM15-17)
+    pub first_timer: String,     // Boolean
     #[serde(rename(serialize = "GenuinePB", deserialize = "GenuinePB"))]
     pub genuine_pb: String, // Boolean
-    pub updated: String, // Date time
-    pub assisted: Option<bool> // Not sure?
+    pub updated: String,         // Date time
+    pub assisted: Option<bool>,  // Not sure?
 }
 
 impl RunResult {
     pub fn duration(&self) -> Duration {
-        let duration_splits = self.run_time.split(":").collect::<Vec<&str>>();
+        let duration_splits = self.run_time.split(':').collect::<Vec<&str>>();
         let mins: u32 = from_str(duration_splits.get(1).unwrap()).unwrap_or(0);
         let seconds: u32 = from_str(duration_splits.get(2).unwrap()).unwrap_or(0);
 

@@ -1,18 +1,21 @@
 use chrono::Duration;
-use std::{time::Duration as StdDuration, collections::HashSet};
+use std::{collections::HashSet, time::Duration as StdDuration};
 
 use crate::models::parkrun::RunResult;
 
-pub fn total_time(results: &Vec<RunResult>) -> Duration {
-    let seconds: i64 = results.iter().map(|result| result.duration().num_seconds()).sum();
+pub fn total_time(results: &[RunResult]) -> Duration {
+    let seconds: i64 = results
+        .iter()
+        .map(|result| result.duration().num_seconds())
+        .sum();
     Duration::from_std(StdDuration::from_secs(seconds.try_into().unwrap())).unwrap()
 }
 
-pub fn average_time(results: &Vec<RunResult>) -> Duration {
+pub fn average_time(results: &[RunResult]) -> Duration {
     total_time(results) / results.len().try_into().unwrap()
 }
 
-pub fn events(results: &Vec<RunResult>) -> HashSet<String> {
+pub fn events(results: &[RunResult]) -> HashSet<String> {
     HashSet::from_iter(results.iter().map(|result| result.event_number.clone()))
 }
 
