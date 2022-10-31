@@ -12,6 +12,8 @@ defaults:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      content: write
     steps:
       - uses: actions-rs/toolchain@v1
         with:
@@ -28,5 +30,5 @@ jobs:
       - uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
-          github_token: $
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
