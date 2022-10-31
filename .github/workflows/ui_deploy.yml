@@ -13,7 +13,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      content: write
+      contents: write
     steps:
       - uses: actions-rs/toolchain@v1
         with:
