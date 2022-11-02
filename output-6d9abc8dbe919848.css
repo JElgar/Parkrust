@@ -585,6 +585,10 @@ video {
   grid-column: span 12 / span 12;
 }
 
+.m-1 {
+  margin: 0.25rem;
+}
+
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -635,6 +639,10 @@ video {
 
 .max-w-md {
   max-width: 28rem;
+}
+
+.grow {
+  flex-grow: 1;
 }
 
 .table-auto {
