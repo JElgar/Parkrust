@@ -8,6 +8,21 @@ pub struct StatCardProps {
     pub value: AttrValue,
 }
 
+#[function_component(Calendar)]
+pub fn calendar() -> Html {
+    let tiles = (0..52).map(|val| {
+        html! {
+            <div class="grow bg-white m-1 rounded-lg shadow-md"> { val } </div>
+        }
+    }).collect::<Html>();
+
+    html! {
+        <div class="flex">
+            { tiles }
+        </div>
+    }
+}
+
 #[function_component(StatCard)]
 pub fn stat_card(StatCardProps { value, title }: &StatCardProps) -> Html {
     html! {
@@ -31,6 +46,10 @@ pub fn home() -> Html {
             html! {
                 <div class="p-8">
                     <div class="grid grid-cols-12 gap-6">
+                        <div class="col-span-12">
+                            <Calendar />
+                        </div>
+
                         <StatCard title="Total runs" value={ results.len().to_string() } />
                         <StatCard title="Average time" value={ duration_formatter(average_time(results)) } />
                         <StatCard title="Total time" value={ duration_formatter(total_time(results)) } />
