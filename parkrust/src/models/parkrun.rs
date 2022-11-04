@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::Duration;
+use chrono::{Duration, Date, Utc, NaiveDate};
 use serde::{Deserialize, Serialize};
 use std::time::Duration as StdDuration;
 
@@ -126,5 +126,10 @@ impl RunResult {
 
         let duration = StdDuration::new((seconds + mins * 60).into(), 0);
         Duration::from_std(duration).unwrap()
+    }
+
+    pub fn date(&self) -> Date<Utc> {
+        let naive_date = NaiveDate::parse_from_str(self.event_date.as_str(), "%Y-%m-%d").unwrap();
+        Date::from_utc(naive_date, Utc)
     }
 }

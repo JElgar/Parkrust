@@ -1,6 +1,92 @@
 use crate::{components::Card, routes::results::Results, services::parkrun::use_results};
+use gloo::console::log;
 use parkrust::client::requests::{average_time, duration_formatter, events, total_time};
+use parkrust::models::parkrun::RunResult;
 use yew::prelude::*;
+use chrono::{DateTime, Utc, Duration, Month};
+use chrono::prelude::*;
+use num_traits::cast::FromPrimitive;
+
+#[function_component(Calendar)]
+pub fn calendar() -> Html {
+    let results_state = use_results();
+
+    pub fn get_next_saturday(start_date: Date<Utc>) -> Date<Utc> {
+        let days_till_next_saturday = (7 - start_date.weekday().num_days_from_sunday() + 6) % 7;
+        start_date + Duration::days(days_till_next_saturday as i64)
+    }
+
+    fn get_saturdays_in_month(month: u32, year: i32) -> Vec<Date<Utc>> {
+        let first_day_of_month = Date::from_utc(NaiveDate::from_ymd(year, month, 1), Utc);
+        let first_saturday = get_next_saturday(first_day_of_month);
+
+        let mut saturdays = Vec::new();
+        let mut current_saturday = first_saturday; 
+        while current_saturday.month() == month {
+            saturdays.push(current_saturday);
+            current_saturday = current_saturday + Duration::days(7);
+        }
+        saturdays 
+    }
+
+    fn result_on_day(day: &Date<Utc>, results: &Vec<RunResult>) -> Option<RunResult> {
+        results.iter().find_map(|result| if &result.date() == day { Some(result.clone()) } else { None })
+    }
+
+    fn rows(results: &Vec<RunResult>) -> Html {
+        let year = 2022;
+        (1..=12).map(|month| {
+            let day_tiles = get_saturdays_in_month(month, year).iter().map(|day| {
+                let result = result_on_day(day, results);
+                let classes = {
+                    let background_colors = match result {
+                        Some(_) => {
+                            "dark:bg-green-400"
+                        },
+                        None => {
+                            "dark:bg-slate-700"
+                        }
+                    };
+                    format!("p-1 w-10 bg-white rounded-lg shadow-md dark:border-gray-700 text-center {}", background_colors)
+                };
+
+                html! {
+                    <td>
+                        <div class={classes}>
+                            { day.day() } 
+                        </div>
+                    </td>
+                }
+            }).collect::<Html>();
+
+            html! {
+                <tr class="text-right" > 
+                    <td>  
+                        <div class="pr-2">
+                            { Month::from_u32(month).unwrap().name() }
+                        </div>
+                    </td>
+                    { day_tiles } 
+                </tr>
+            }
+        }).collect::<Html>()
+    }
+
+    match &*results_state {
+        Some(results) => {
+            html! {
+                <table class="table-fixed">
+                    { rows(results) }
+                </table>
+            }
+        },
+        None => {
+            html! {
+                <div> { "Loading..." } </div>
+            }
+        },
+    }
+}
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct StatCardProps {
@@ -8,20 +94,6 @@ pub struct StatCardProps {
     pub value: AttrValue,
 }
 
-#[function_component(Calendar)]
-pub fn calendar() -> Html {
-    let tiles = (0..52).map(|val| {
-        html! {
-            <div class="grow bg-white m-1 rounded-lg shadow-md"> { val } </div>
-        }
-    }).collect::<Html>();
-
-    html! {
-        <div class="flex">
-            { tiles }
-        </div>
-    }
-}
 
 #[function_component(StatCard)]
 pub fn stat_card(StatCardProps { value, title }: &StatCardProps) -> Html {
@@ -47,7 +119,9 @@ pub fn home() -> Html {
                 <div class="p-8">
                     <div class="grid grid-cols-12 gap-6">
                         <div class="col-span-12">
-                            <Calendar />
+                            <Card>
+                                <Calendar />
+                            </Card>
                         </div>
 
                         <StatCard title="Total runs" value={ results.len().to_string() } />
