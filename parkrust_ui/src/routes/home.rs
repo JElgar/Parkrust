@@ -1,3 +1,4 @@
+use crate::routes::events::Events;
 use crate::{components::Card, routes::results::Results, services::parkrun::use_results};
 use gloo::console::log;
 use parkrust::client::requests::{average_time, duration_formatter, events, total_time};
@@ -41,13 +42,17 @@ pub fn calendar() -> Html {
                 let classes = {
                     let background_colors = match result {
                         Some(_) => {
-                            "dark:bg-green-400"
+                            "bg-green-400"
                         },
                         None => {
-                            "dark:bg-slate-700"
+                            if day >= &Utc::now().date() {
+                                "dark:bg-slate-700"
+                            } else {
+                                "dark:bg-slate-500"
+                            }
                         }
                     };
-                    format!("p-1 w-10 bg-white rounded-lg shadow-md dark:border-gray-700 text-center {}", background_colors)
+                    format!("m-1 p-1 w-10 bg-white rounded-lg shadow-md dark:border-gray-700 text-center {}", background_colors)
                 };
 
                 html! {
@@ -72,7 +77,7 @@ pub fn calendar() -> Html {
         }).collect::<Html>()
     }
 
-    match &*results_state {
+    let calendar = match &*results_state {
         Some(results) => {
             html! {
                 <table class="table-fixed">
@@ -85,6 +90,13 @@ pub fn calendar() -> Html {
                 <div> { "Loading..." } </div>
             }
         },
+    };
+
+    html! {
+        <>
+            <div class="mt-3 text-3xl font-bold leading-8 mb-6"> { "Calendar" } </div>
+            { calendar }
+        </>
     }
 }
 
@@ -102,7 +114,7 @@ pub fn stat_card(StatCardProps { value, title }: &StatCardProps) -> Html {
             <Card>
                 <div class="w-full">
                    <div class="mt-3 text-3xl font-bold leading-8"> { value } </div>
-                   <div class="mt-1 text-base text-gray-600"> { title } </div>
+                   <div class="mt-1 text-base text-gray-600 dark:text-white"> { title } </div>
                 </div>
             </Card>
         </div>
@@ -118,20 +130,25 @@ pub fn home() -> Html {
             html! {
                 <div class="p-8">
                     <div class="grid grid-cols-12 gap-6">
-                        <div class="col-span-12">
-                            <Card>
-                                <Calendar />
-                            </Card>
-                        </div>
-
                         <StatCard title="Total runs" value={ results.len().to_string() } />
                         <StatCard title="Average time" value={ duration_formatter(average_time(results)) } />
                         <StatCard title="Total time" value={ duration_formatter(total_time(results)) } />
                         <StatCard title="Locations" value={ events(results).len().to_string() } />
-                        <div class="transform col-span-12">
+                        <div class="col-span-12 sm:col-span-6">
+                            <Card>
+                                <Calendar />
+                            </Card>
+                        </div>
+                        <div class="transform col-span-12 row-span-3 sm:col-span-6">
                             <Card>
                                 <div class="mt-3 text-3xl font-bold leading-8 mb-6"> { "Results" } </div>
                                 <Results />
+                            </Card>
+                        </div>
+                        <div class="transform col-span-12 sm:col-span-6">
+                            <Card>
+                                <div class="mt-3 text-3xl font-bold leading-8 mb-6"> { "Results" } </div>
+                                <Events />
                             </Card>
                         </div>
                     </div>

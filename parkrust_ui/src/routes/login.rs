@@ -27,11 +27,6 @@ pub fn login_view() -> Html {
             let auth_ctx = auth_ctx.clone();
             let navigator = navigator.clone();
             wasm_bindgen_futures::spawn_local(async move {
-                // let client = ParkrunClient::new()
-                //     .authenticate("", "")
-                //     .await;
-
-                // login("", "").await;
                 let athlete_id = (*athlete_id).as_str();
                 let token = login(athlete_id, (*password).as_str()).await;
                 auth_ctx.dispatch(AuthAction::Login(AuthData {
@@ -50,11 +45,12 @@ pub fn login_view() -> Html {
                     <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                         {"Sign in to your account"}
                     </h2>
+                    <p class="mt-2 text-center text-sm text-gray-600">
+                        { "Sign in to your parkrun account. To create an account or reset your password head to the " }
+                        <a href="https://www.parkrun.org.uk/register/" class="font-medium text-indigo-600 hover:text-indigo-500"> { "Parkrun website" } </a>
+                        { "." }
+                    </p>
                 </div>
-                <Button text="Click me" onclick={Callback::from(|event: MouseEvent| {
-                    event.prevent_default();
-                    log!("Hello button");
-                })}/>
                 <form class="mt-8 space-y-6" {onsubmit} >
                     <div class="rounded-md shadow-sm space-y-6">
                         <Input
@@ -90,7 +86,7 @@ pub fn login_view() -> Html {
                             }
                         />
                     </div>
-                    <Button text="Login no on click" />
+                    <Button text="Login" />
                 </form>
             </div>
         </div>

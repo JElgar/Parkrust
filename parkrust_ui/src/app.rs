@@ -1,5 +1,5 @@
 use parkrust_ui::services::parkrun::{
-    get_auth_data_from_local_storage, AuthContext, AuthData, AuthState,
+    get_auth_data_from_local_storage, AuthContext, AuthData, AuthState, Cache,
 };
 use yew::prelude::*;
 use yew_router::prelude::Redirect;
@@ -29,7 +29,7 @@ fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
 pub fn app() -> Html {
     let auth_state = use_reducer(|| AuthState {
         data: get_auth_data_from_local_storage(),
-        results_cache: None,
+        cache: Cache::default(),
     });
     html! {
         <ContextProvider<AuthContext> context={auth_state}>

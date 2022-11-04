@@ -5,7 +5,7 @@ use gloo::{
 };
 use parkrust::{
     client::{AuthenticatedParkrunClient, ParkrunClient, Token},
-    models::parkrun::{Listable, ResultsQuery, RunResult},
+    models::parkrun::{Listable, ResultsQuery, RunResult, Event, EventsQuery},
 };
 use std::rc::Rc;
 use yew::prelude::*;
@@ -22,15 +22,22 @@ pub struct AuthData {
 }
 
 #[derive(Default, Clone, PartialEq)]
+pub struct Cache {
+    pub results_cache: Option<Vec<RunResult>>,
+    pub events_cache: Option<Vec<Event>>,
+}
+
+#[derive(Default, Clone, PartialEq)]
 pub struct AuthState {
     pub data: Option<AuthData>,
-    pub results_cache: Option<Vec<RunResult>>,
+    pub cache: Cache,
 }
 
 pub enum AuthAction {
     Login(AuthData),
     Refresh(Token),
     CacheResults(Vec<RunResult>),
+    CacheEvents(Vec<Event>),
 }
 
 pub type AuthContext = UseReducerHandle<AuthState>;
@@ -56,7 +63,6 @@ pub fn use_results() -> UseStateHandle<Option<Vec<RunResult>>> {
 
     {
         let results = results.clone();
-        println!("Getting stuff");
         use_effect_with_deps(
             move |_| {
                 wasm_bindgen_futures::spawn_local(async move {
@@ -69,6 +75,27 @@ pub fn use_results() -> UseStateHandle<Option<Vec<RunResult>>> {
     }
 
     results
+}
+
+#[hook]
+pub fn use_events() -> UseStateHandle<Option<Vec<Event>>> {
+    let events = use_state(|| None);
+    let auth_ctx = use_context::<AuthContext>().unwrap();
+
+    {
+        let events = events.clone();
+        use_effect_with_deps(
+            move |_| {
+                wasm_bindgen_futures::spawn_local(async move {
+                    events.set(Some(get_user_events(&auth_ctx).await));
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
+    events 
 }
 
 pub async fn get_client(
@@ -89,7 +116,7 @@ pub async fn get_client(
 
 pub async fn get_user_results(auth_ctx: &UseReducerHandle<AuthState>) -> Vec<RunResult> {
     let athlete_id = auth_ctx.data.as_ref().unwrap().athlete_id.clone();
-    if let Some(results) = &auth_ctx.results_cache {
+    if let Some(results) = &auth_ctx.cache.results_cache {
         return results.to_vec();
     }
 
@@ -99,6 +126,20 @@ pub async fn get_user_results(auth_ctx: &UseReducerHandle<AuthState>) -> Vec<Run
         .unwrap();
     auth_ctx.dispatch(AuthAction::CacheResults(results.clone()));
     results
+}
+
+pub async fn get_user_events(auth_ctx: &UseReducerHandle<AuthState>) -> Vec<Event> {
+    let athlete_id = auth_ctx.data.as_ref().unwrap().athlete_id.clone();
+    if let Some(events) = &auth_ctx.cache.events_cache {
+        return events.to_vec();
+    }
+
+    let mut client = get_client(auth_ctx).await.unwrap();
+    let events = Event::list(EventsQuery { athlete_id }, &mut client)
+        .await
+        .unwrap();
+    auth_ctx.dispatch(AuthAction::CacheEvents(events.clone()));
+    events
 }
 
 impl Reducible for AuthState {
@@ -113,27 +154,43 @@ impl Reducible for AuthState {
                 store_althlete_id(&auth_data.athlete_id).unwrap();
                 Self {
                     data: Some(auth_data),
-                    results_cache: None,
+                    cache: Cache::default(),
                 }
                 .into()
             }
             AuthAction::Refresh(token) => {
                 let athlete_id = &self.data.as_ref().unwrap().athlete_id;
-                let results_cache = self.results_cache.clone();
+                let cache = self.cache.clone();
                 Self {
                     data: Some(AuthData {
                         athlete_id: String::from(athlete_id),
                         token,
                     }),
-                    results_cache,
+                    cache,
                 }
                 .into()
             }
             AuthAction::CacheResults(results) => {
                 let auth_data = self.data.clone();
+                let cache = self.cache.clone();
                 Self {
                     data: auth_data,
-                    results_cache: Some(results),
+                    cache: Cache {
+                        results_cache: Some(results),
+                        ..cache
+                    }
+                }
+                .into()
+            }
+            AuthAction::CacheEvents(events) => {
+                let auth_data = self.data.clone();
+                let cache = self.cache.clone();
+                Self {
+                    data: auth_data,
+                    cache: Cache {
+                        events_cache: Some(events),
+                        ..cache
+                    }
                 }
                 .into()
             }

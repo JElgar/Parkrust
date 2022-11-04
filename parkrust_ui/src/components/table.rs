@@ -30,19 +30,13 @@ pub struct TableProps<T: PartialEq> {
 pub fn table<T: TableDataType>(TableProps { data }: &TableProps<T>) -> Html {
     html! {
         <div class="overflow-x-auto relative">
-          <table class="min-w-full divide-y divide-gray-200 table-auto ixed dark:divide-gray-700">
+          <table class="min-w-full table-auto">
               <thead class="bg-gray-100 dark:bg-gray-700">
                 <tr>
                   {
                       T::get_headers().iter().enumerate().map(|(index, header)| {
-                        let background_color_css = if index % 2 == 0 {
-                            ""
-                        } else {
-                            "bg-gray-50 dark:bg-gray-800"
-                        };
-
                         html! {
-                            <th scope="col" class={"py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400".to_owned() + background_color_css}>{ header }</th>
+                            <th scope="col" class={"py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400" }>{ header }</th>
                         }
                       }).collect::<Html>()
                   }

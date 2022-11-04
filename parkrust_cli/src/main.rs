@@ -14,17 +14,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
      match &args.command {
         Command::Run{ id, password } => {
-            let client = ParkrunClient::new()
+            let mut client = ParkrunClient::new()
                 .authenticate(id, password)
                 .await?;
 
             // println!("{:?}", client.get_me().await?);
 
-            // RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap();
+            // RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &mut client).await.unwrap();
             // println!("{:?}", RunResult::list(ResultsQuery{ athlete_id: id.clone() }, &client).await.unwrap());
-            println!("Total time: {:?}", total_time(&client, &id).await);
-            println!("Average time: {:?}", average_time(&client, &id).await);
-            // println!("{:?}", Event::list(EventsQuery{ athlete_id: id.clone() }, &client).await?);
+            // println!("Total time: {:?}", total_time(&client, &id).await);
+            // println!("Average time: {:?}", average_time(&client, &id).await);
+            println!("{:?}", Event::list(EventsQuery{ athlete_id: id.clone() }, &mut client).await.unwrap());
         },
      }
 

@@ -68,22 +68,22 @@ pub struct EventsQuery {
     data_key = "events"
 )]
 pub struct Event {
-    event_number: String,
-    event_name: String,
-    event_short_name: String,
-    event_long_name: String,
-    event_location: String,
-    country_code: String,
-    preferred_language: String,
+    pub event_number: String,
+    pub event_name: String,
+    pub event_short_name: String,
+    pub event_long_name: String,
+    pub event_location: String,
+    pub country_code: String,
+    pub preferred_language: String,
     #[serde(rename(serialize = "SeriesID", deserialize = "SeriesID"))]
-    series_id: String,
-    next_anniversary: String,
-    home_run_selection: String,
-    status_live: String,
-    anniversary_saturday_of_month: String,
-    event_status: String,
-    user_favourite: Option<String>,
-    accessible_to_public: String,
+    pub series_id: String,
+    pub next_anniversary: String,
+    pub home_run_selection: String,
+    pub status_live: String,
+    pub anniversary_saturday_of_month: String,
+    pub event_status: String,
+    pub user_favourite: Option<String>,
+    pub accessible_to_public: String,
 }
 
 #[parkrun_request_args()]
