@@ -919,16 +919,16 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1811 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 856, __wbg_adapter_34);
+    imports.wbg.__wbindgen_closure_wrapper1901 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 906, __wbg_adapter_34);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2227 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 1000, __wbg_adapter_37);
+    imports.wbg.__wbindgen_closure_wrapper2317 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 1050, __wbg_adapter_37);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2298 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 1029, __wbg_adapter_40);
+    imports.wbg.__wbindgen_closure_wrapper2388 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 1079, __wbg_adapter_40);
         return addHeapObject(ret);
     };
 
@@ -967,7 +967,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('parkrust_ui-57b31fbd97a69706_bg.wasm', import.meta.url);
+        input = new URL('parkrust_ui-35e7e61f899bab3f_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
