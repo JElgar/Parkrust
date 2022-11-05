@@ -38,7 +38,7 @@ pub fn results() -> Html {
                 .map(ResultTableData::from_parkrun_result)
                 .collect::<Vec<ResultTableData>>();
             html! {
-                <Table<ResultTableData> data={table_data} />
+                <Table<ResultTableData> data={table_data} page_size={10}/>
             }
         }
         None => {

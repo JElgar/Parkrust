@@ -52,7 +52,7 @@ pub fn calendar() -> Html {
                             }
                         }
                     };
-                    format!("m-1 p-1 w-10 bg-white rounded-lg shadow-md dark:border-gray-700 text-center {}", background_colors)
+                    format!("lg:m-1 p-1 w-10 bg-white rounded-lg shadow-md dark:border-gray-700 text-center {}", background_colors)
                 };
 
                 html! {
@@ -134,18 +134,18 @@ pub fn home() -> Html {
                         <StatCard title="Average time" value={ duration_formatter(average_time(results)) } />
                         <StatCard title="Total time" value={ duration_formatter(total_time(results)) } />
                         <StatCard title="Locations" value={ events(results).len().to_string() } />
-                        <div class="col-span-12 sm:col-span-6">
+                        <div class="col-span-12 md:col-span-6">
                             <Card>
                                 <Calendar />
                             </Card>
                         </div>
-                        <div class="transform col-span-12 row-span-3 sm:col-span-6">
+                        <div class="transform col-span-12 row-span-3 md:col-span-6">
                             <Card>
                                 <div class="mt-3 text-3xl font-bold leading-8 mb-6"> { "Results" } </div>
                                 <Results />
                             </Card>
                         </div>
-                        <div class="transform col-span-12 sm:col-span-6">
+                        <div class="transform col-span-12 md:col-span-6">
                             <Card>
                                 <div class="mt-3 text-3xl font-bold leading-8 mb-6"> { "Results" } </div>
                                 <Events />
