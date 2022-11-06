@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use parkrust_ui_derive::table_data_type;
 use yew::prelude::*;
 
@@ -17,7 +15,7 @@ pub trait TableDataType: PartialEq {
 }
 
 // Probably use a map for the dcurrentpage: currentPage? Or create a macro!
-#[derive(Clone, PartialEq, Properties)]
+#[derive(Clone, PartialEq, Eq, Properties)]
 pub struct TableProps<T: PartialEq> {
     pub data: Vec<T>,
     pub page_size: Option<usize>,
@@ -31,14 +29,20 @@ pub struct TableProps<T: PartialEq> {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct TableNavProps {
-    pub currentPage: usize,
-    pub numPages: usize,
+    pub current_page: usize,
+    pub num_pages: usize,
     #[prop_or_default]
-    pub setPage: Callback<usize>,
+    pub setpage: Callback<usize>,
 }
 
 #[function_component(TableNav)]
-pub fn table_nav(TableNavProps { currentPage, numPages, setPage }: &TableNavProps) -> Html {
+pub fn table_nav(
+    TableNavProps {
+        current_page,
+        num_pages,
+        setpage,
+    }: &TableNavProps,
+) -> Html {
     let base_css = "relative inline-flex items-center border border-gray-300 bg-white py-2 text-sm font-medium text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700";
     let base_button_css = format!("{} px-2 hover:bg-gray-50 focus:z-20", base_css);
     html! {
@@ -46,8 +50,8 @@ pub fn table_nav(TableNavProps { currentPage, numPages, setPage }: &TableNavProp
                 <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                   <button
                     onclick={
-                        let current_page = currentPage.clone();
-                        let set_page = setPage.clone();
+                        let current_page = *current_page;
+                        let set_page = setpage.clone();
                         Callback::from(move |_| if current_page > 1 { set_page.emit(current_page - 1) })
                     }
                     class={format!("{} rounded-l-md", base_button_css)}
@@ -59,14 +63,14 @@ pub fn table_nav(TableNavProps { currentPage, numPages, setPage }: &TableNavProp
                   </button>
 
                   <div
-                      class={format!("{} px-4", base_css)}> { format!("{}/{}", currentPage.to_string(), numPages)}
+                      class={format!("{} px-4", base_css)}> { format!("{}/{}", current_page, num_pages)}
                   </div>
 
                   <button
                     onclick={
-                        let current_page = currentPage.clone();
-                        let num_pages = numPages.clone();
-                        let set_page = setPage.clone();
+                        let current_page = *current_page;
+                        let num_pages = *num_pages;
+                        let set_page = setpage.clone();
                         Callback::from(move |_| if current_page < num_pages { set_page.emit(current_page + 1) })
                     }
                     class={format!("{} rounded-r-md", base_button_css)}
@@ -95,7 +99,7 @@ pub fn table<T: TableDataType>(TableProps { data, page_size }: &TableProps<T>) -
               <thead class="bg-gray-100 dark:bg-gray-700">
                 <tr>
                   {
-                      T::get_headers().iter().enumerate().map(|(index, header)| {
+                      T::get_headers().iter().map(|header| {
                         html! {
                             <th scope="col" class={"py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400" }>{ header }</th>
                         }
@@ -123,7 +127,7 @@ pub fn table<T: TableDataType>(TableProps { data, page_size }: &TableProps<T>) -
               </tbody>
           </table>
           if num_pages > 1 {
-              <TableNav currentPage={*current_page} numPages={num_pages} setPage={
+              <TableNav current_page={*current_page} num_pages={num_pages} setpage={
                   Callback::from(move |page| current_page.set(page))
               }/>
           }

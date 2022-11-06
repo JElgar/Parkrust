@@ -5,7 +5,7 @@ use gloo::{
 };
 use parkrust::{
     client::{AuthenticatedParkrunClient, ParkrunClient, Token},
-    models::parkrun::{Listable, ResultsQuery, RunResult, Event, EventsQuery},
+    models::parkrun::{Event, EventsQuery, Listable, ResultsQuery, RunResult},
 };
 use std::rc::Rc;
 use yew::prelude::*;
@@ -95,7 +95,7 @@ pub fn use_events() -> UseStateHandle<Option<Vec<Event>>> {
         );
     }
 
-    events 
+    events
 }
 
 pub async fn get_client(
@@ -178,7 +178,7 @@ impl Reducible for AuthState {
                     cache: Cache {
                         results_cache: Some(results),
                         ..cache
-                    }
+                    },
                 }
                 .into()
             }
@@ -190,7 +190,7 @@ impl Reducible for AuthState {
                     cache: Cache {
                         events_cache: Some(events),
                         ..cache
-                    }
+                    },
                 }
                 .into()
             }

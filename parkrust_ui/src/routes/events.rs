@@ -4,7 +4,7 @@ use parkrust_ui_derive::table_data_type;
 use yew::prelude::*;
 
 use crate::components::Table;
-use crate::services::parkrun::{use_results, use_events};
+use crate::services::parkrun::{use_events, use_results};
 
 #[table_data_type()]
 pub struct EventTableData {
@@ -23,7 +23,11 @@ impl EventTableData {
     ) -> Self {
         EventTableData {
             event_name: event_short_name.clone(),
-            run_count: results.iter().filter(|result| &result.event_number == event_number).count().to_string(),
+            run_count: results
+                .iter()
+                .filter(|result| &result.event_number == event_number)
+                .count()
+                .to_string(),
         }
     }
 }
@@ -35,9 +39,9 @@ pub fn events() -> Html {
 
     match &*events_state {
         Some(events) => {
-            let results = &*results.as_ref().unwrap();
+            let results = results.as_ref().unwrap();
 
-            let mut table_data = events 
+            let mut table_data = events
                 .iter()
                 .map(|event| EventTableData::from_parkrun_models(event, results))
                 .collect::<Vec<EventTableData>>();

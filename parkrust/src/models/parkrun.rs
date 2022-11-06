@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{Duration, Date, Utc, NaiveDate};
+use chrono::{Date, Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use std::time::Duration as StdDuration;
 

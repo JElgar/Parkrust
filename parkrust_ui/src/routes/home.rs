@@ -1,11 +1,11 @@
 use crate::routes::events::Events;
 use crate::{components::Card, routes::results::Results, services::parkrun::use_results};
+use chrono::prelude::*;
+use chrono::{Duration, Month, Utc};
+use num_traits::cast::FromPrimitive;
 use parkrust::client::requests::{average_time, duration_formatter, events, total_time};
 use parkrust::models::parkrun::RunResult;
 use yew::prelude::*;
-use chrono::{Utc, Duration, Month};
-use chrono::prelude::*;
-use num_traits::cast::FromPrimitive;
 
 #[function_component(Calendar)]
 pub fn calendar() -> Html {
@@ -21,19 +21,25 @@ pub fn calendar() -> Html {
         let first_saturday = get_next_saturday(first_day_of_month);
 
         let mut saturdays = Vec::new();
-        let mut current_saturday = first_saturday; 
+        let mut current_saturday = first_saturday;
         while current_saturday.month() == month {
             saturdays.push(current_saturday);
-            current_saturday = current_saturday + Duration::days(7);
+            current_saturday += Duration::days(7);
         }
-        saturdays 
+        saturdays
     }
 
-    fn result_on_day(day: &Date<Utc>, results: &Vec<RunResult>) -> Option<RunResult> {
-        results.iter().find_map(|result| if &result.date() == day { Some(result.clone()) } else { None })
+    fn result_on_day(day: &Date<Utc>, results: &[RunResult]) -> Option<RunResult> {
+        results.iter().find_map(|result| {
+            if &result.date() == day {
+                Some(result.clone())
+            } else {
+                None
+            }
+        })
     }
 
-    fn rows(results: &Vec<RunResult>) -> Html {
+    fn rows(results: &[RunResult]) -> Html {
         let year = 2022;
         (1..=12).map(|month| {
             let day_tiles = get_saturdays_in_month(month, year).iter().map(|day| {
@@ -57,7 +63,7 @@ pub fn calendar() -> Html {
                 html! {
                     <td>
                         <div class={classes}>
-                            { day.day() } 
+                            { day.day() }
                         </div>
                     </td>
                 }
@@ -65,12 +71,12 @@ pub fn calendar() -> Html {
 
             html! {
                 <tr class="text-right" > 
-                    <td>  
+                    <td>
                         <div class="pr-2">
                             { Month::from_u32(month).unwrap().name() }
                         </div>
                     </td>
-                    { day_tiles } 
+                    { day_tiles }
                 </tr>
             }
         }).collect::<Html>()
@@ -83,12 +89,12 @@ pub fn calendar() -> Html {
                     { rows(results) }
                 </table>
             }
-        },
+        }
         None => {
             html! {
                 <div> { "Loading..." } </div>
             }
-        },
+        }
     };
 
     html! {
@@ -99,16 +105,21 @@ pub fn calendar() -> Html {
     }
 }
 
-#[derive(Clone, PartialEq, Properties)]
+#[derive(Clone, PartialEq, Eq, Properties)]
 pub struct StatCardProps {
     pub title: AttrValue,
     pub emoji: AttrValue,
     pub value: AttrValue,
 }
 
-
 #[function_component(StatCard)]
-pub fn stat_card(StatCardProps { value, title, emoji }: &StatCardProps) -> Html {
+pub fn stat_card(
+    StatCardProps {
+        value,
+        title,
+        emoji,
+    }: &StatCardProps,
+) -> Html {
     html! {
         <div class="transform col-span-6 lg:col-span-3">
             <Card>

@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew::virtual_dom::AttrValue;
 
 /// The `TextFieldType` type
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TextFieldType {
     Text,
     Search,

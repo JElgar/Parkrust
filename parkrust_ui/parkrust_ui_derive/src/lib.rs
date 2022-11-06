@@ -23,6 +23,7 @@ fn impl_table_data_type(struct_: ItemStruct) -> TokenStream {
         .collect();
 
     quote! {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(PartialEq)]
         #struct_
 

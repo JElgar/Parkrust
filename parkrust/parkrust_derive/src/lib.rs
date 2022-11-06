@@ -8,6 +8,7 @@ pub fn parkrun_model(_: TokenStream, item: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(item as ItemStruct);
 
     quote! {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
         #[serde(rename_all = "PascalCase")]
         #ast

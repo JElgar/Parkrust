@@ -1,7 +1,6 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use gloo::console::log;
 use web_sys::HtmlInputElement;
 
 use crate::{

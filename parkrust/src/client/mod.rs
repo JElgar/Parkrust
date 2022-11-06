@@ -6,7 +6,7 @@ use crate::models::parkrun::{AuthResponse, RefreshTokenResponse};
 
 pub mod requests;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Token {
     pub access_token: String,
     pub refresh_token: String,
