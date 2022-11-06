@@ -2,6 +2,8 @@
 name = "parkrust_derive"
 version = "0.1.0"
 edition = "2021"
+description = "proc macros package for parkrust"
+license = "MIT OR Apache-2.0"
 
 [lib]
 proc-macro = true
