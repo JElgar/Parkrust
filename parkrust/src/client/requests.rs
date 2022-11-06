@@ -24,5 +24,9 @@ pub fn duration_formatter(duration: Duration) -> String {
     let minutes = (duration.num_seconds() / 60) % 60;
     let hours = (duration.num_seconds() / 60) / 60;
 
-    format!("{}:{}:{}", hours, minutes, seconds)
+    if hours == 0 {
+        format!("{:0>2}:{:0>2}", minutes, seconds)
+    } else {
+        format!("{:0>2}:{:0>2}:{:0>2}", hours, minutes, seconds)
+    }
 }

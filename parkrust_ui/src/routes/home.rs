@@ -1,10 +1,9 @@
 use crate::routes::events::Events;
 use crate::{components::Card, routes::results::Results, services::parkrun::use_results};
-use gloo::console::log;
 use parkrust::client::requests::{average_time, duration_formatter, events, total_time};
 use parkrust::models::parkrun::RunResult;
 use yew::prelude::*;
-use chrono::{DateTime, Utc, Duration, Month};
+use chrono::{Utc, Duration, Month};
 use chrono::prelude::*;
 use num_traits::cast::FromPrimitive;
 
@@ -103,17 +102,18 @@ pub fn calendar() -> Html {
 #[derive(Clone, PartialEq, Properties)]
 pub struct StatCardProps {
     pub title: AttrValue,
+    pub emoji: AttrValue,
     pub value: AttrValue,
 }
 
 
 #[function_component(StatCard)]
-pub fn stat_card(StatCardProps { value, title }: &StatCardProps) -> Html {
+pub fn stat_card(StatCardProps { value, title, emoji }: &StatCardProps) -> Html {
     html! {
         <div class="transform col-span-6 lg:col-span-3">
             <Card>
                 <div class="w-full">
-                   <div class="mt-3 text-3xl font-bold leading-8"> { value } </div>
+                   <div class="mt-3 text-3xl font-bold leading-8"> { format!("{} {}", emoji, value) } </div>
                    <div class="mt-1 text-base text-gray-600 dark:text-white"> { title } </div>
                 </div>
             </Card>
@@ -130,10 +130,10 @@ pub fn home() -> Html {
             html! {
                 <div class="p-8">
                     <div class="grid grid-cols-12 gap-6">
-                        <StatCard title="Total runs" value={ results.len().to_string() } />
-                        <StatCard title="Average time" value={ duration_formatter(average_time(results)) } />
-                        <StatCard title="Total time" value={ duration_formatter(total_time(results)) } />
-                        <StatCard title="Locations" value={ events(results).len().to_string() } />
+                        <StatCard emoji="🏃" title="Total runs" value={ results.len().to_string() } />
+                        <StatCard emoji="⏱" title="Average time" value={ duration_formatter(average_time(results)) } />
+                        <StatCard emoji="📆" title="Total time" value={ duration_formatter(total_time(results)) } />
+                        <StatCard emoji="📍" title="Locations" value={ events(results).len().to_string() } />
                         <div class="col-span-12 md:col-span-6">
                             <Card>
                                 <Calendar />
