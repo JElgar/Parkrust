@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3c057d67-2daa-419d-96dc-a50fd448fd29/deploy-status)](https://app.netlify.com/sites/parkrust/deploys)
+
 # Parkrust UI
 
 A UI for parkrun data.
