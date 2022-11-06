@@ -49,9 +49,7 @@ pub fn router() -> Html {
 
     html! {
         <BrowserRouter>
-            <div class="dark:bg-slate-900">
-                <Switch<Route> render={render} />
-            </div>
+            <Switch<Route> render={render} />
         </BrowserRouter>
     }
 }
