@@ -1,3 +1,4 @@
+use parkrust::client::requests::{duration_formatter, fastest_time};
 use parkrust::models::parkrun::{Event, RunResult};
 use parkrust_ui_derive::table_data_type;
 
@@ -10,6 +11,7 @@ use crate::services::parkrun::{use_events, use_results};
 pub struct EventTableData {
     pub event_name: String,
     pub run_count: String,
+    pub fastest_time: String,
 }
 
 impl EventTableData {
@@ -21,6 +23,11 @@ impl EventTableData {
         }: &Event,
         results: &[RunResult],
     ) -> Self {
+        let event_results = results
+            .iter()
+            .filter(|result| &result.event_number == event_number)
+            .cloned()
+            .collect::<Vec<RunResult>>();
         EventTableData {
             event_name: event_short_name.clone(),
             run_count: results
@@ -28,6 +35,7 @@ impl EventTableData {
                 .filter(|result| &result.event_number == event_number)
                 .count()
                 .to_string(),
+            fastest_time: duration_formatter(fastest_time(&event_results)),
         }
     }
 }

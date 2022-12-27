@@ -3,10 +3,8 @@ use chrono::{Date, Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use std::time::Duration as StdDuration;
 
-use parkrust_derive::{parkrun_list, parkrun_model, parkrun_request_args};
-use serde_json::from_str;
-
 use crate::client::AuthenticatedParkrunClient;
+use parkrust_derive::{parkrun_list, parkrun_model, parkrun_request_args};
 
 #[async_trait(?Send)]
 pub trait Listable<Args: Serialize + Send> {
@@ -121,8 +119,12 @@ pub struct RunResult {
 impl RunResult {
     pub fn duration(&self) -> Duration {
         let duration_splits = self.run_time.split(':').collect::<Vec<&str>>();
-        let mins: u32 = from_str(duration_splits.get(1).unwrap()).unwrap_or(0);
-        let seconds: u32 = from_str(duration_splits.get(2).unwrap()).unwrap_or(0);
+        let mins: u32 = String::from(*duration_splits.get(1).unwrap())
+            .parse()
+            .unwrap();
+        let seconds: u32 = String::from(*duration_splits.get(2).unwrap())
+            .parse()
+            .unwrap();
 
         let duration = StdDuration::new((seconds + mins * 60).into(), 0);
         Duration::from_std(duration).unwrap()
@@ -131,5 +133,14 @@ impl RunResult {
     pub fn date(&self) -> Date<Utc> {
         let naive_date = NaiveDate::parse_from_str(self.event_date.as_str(), "%Y-%m-%d").unwrap();
         Date::from_utc(naive_date, Utc)
+    }
+
+    pub fn position(&self) -> usize {
+        self.finish_position.parse().unwrap()
+    }
+
+    /// Return speed. The result is the duration per km
+    pub fn speed(&self) -> Duration {
+        self.duration() / 5
     }
 }

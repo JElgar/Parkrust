@@ -1,9 +1,15 @@
 use crate::routes::events::Events;
-use crate::{components::Card, routes::results::Results, services::parkrun::use_results};
+use crate::{
+    components::{Card, LoadingSpinner},
+    routes::results::Results,
+    services::parkrun::use_results,
+};
 use chrono::prelude::*;
 use chrono::{Duration, Month, Utc};
 use num_traits::cast::FromPrimitive;
-use parkrust::client::requests::{average_time, duration_formatter, events, total_time};
+use parkrust::client::requests::{
+    average_speed, average_time, duration_formatter, events, fastest_time, total_time,
+};
 use parkrust::models::parkrun::RunResult;
 use yew::prelude::*;
 
@@ -40,9 +46,8 @@ pub fn calendar() -> Html {
     }
 
     fn rows(results: &[RunResult]) -> Html {
-        let year = 2022;
         (1..=12).map(|month| {
-            let day_tiles = get_saturdays_in_month(month, year).iter().map(|day| {
+            let day_tiles = get_saturdays_in_month(month, Local::now().year()).iter().map(|day| {
                 let result = result_on_day(day, results);
                 let classes = {
                     let background_colors = match result {
@@ -132,6 +137,16 @@ pub fn stat_card(
     }
 }
 
+fn format_total_time(total_time: Duration) -> String {
+    if total_time.num_minutes() < 100 {
+        format!("{}m", total_time.num_minutes())
+    } else if total_time.num_hours() < 1000 {
+        format!("{}h", total_time.num_hours())
+    } else {
+        format!("{}d", total_time.num_days())
+    }
+}
+
 #[function_component(Home)]
 pub fn home() -> Html {
     let results_state = use_results();
@@ -143,8 +158,13 @@ pub fn home() -> Html {
                     <div class="grid grid-cols-12 gap-6">
                         <StatCard emoji="🏃" title="Total runs" value={ results.len().to_string() } />
                         <StatCard emoji="⏱" title="Average time" value={ duration_formatter(average_time(results)) } />
-                        <StatCard emoji="📆" title="Total time" value={ duration_formatter(total_time(results)) } />
+                        <StatCard emoji="⏳" title="Total time" value={ format_total_time(total_time(results)) } />
                         <StatCard emoji="📍" title="Locations" value={ events(results).len().to_string() } />
+                        <StatCard emoji="🚀" title="Fastest time" value={ duration_formatter(fastest_time(results)) } />
+                        <StatCard emoji="📅" title="Runs this year" value={ results.iter().filter(|result| result.date().year() ==  Local::now().year()).count().to_string() } />
+                        <StatCard emoji="👪" title="Best position" value={ results.iter().map(|result| result.position()).min().unwrap().to_string() } />
+                        <StatCard emoji="⌚" title="Average min/km" value={ duration_formatter(average_speed(results)) } />
+
                         <div class="col-span-12 md:col-span-6">
                             <Card>
                                 <Calendar />
@@ -168,7 +188,7 @@ pub fn home() -> Html {
         }
         None => {
             html! {
-                <div> { "Loading..." } </div>
+                <div> <LoadingSpinner /> </div>
             }
         }
     }
