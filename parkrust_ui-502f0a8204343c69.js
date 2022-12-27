@@ -1007,7 +1007,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('parkrust_ui-9306ee7011259e39_bg.wasm', import.meta.url);
+        input = new URL('parkrust_ui-502f0a8204343c69_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
