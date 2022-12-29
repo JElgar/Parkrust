@@ -1,8 +1,10 @@
+use chrono::{Datelike, Utc};
+use parkrust::client::Token;
 use parkrust_ui::services::parkrun::{
     get_auth_data_from_local_storage, AuthContext, AuthData, AuthState, Cache,
 };
 use yew::prelude::*;
-use yew_router::prelude::Redirect;
+use yew_router::prelude::{use_navigator, Redirect};
 use yew_router::{BrowserRouter, Switch};
 
 use parkrust_ui::{
@@ -18,6 +20,13 @@ fn switch(routes: Route, auth_data: Option<AuthData>) -> Html {
         (Route::Login, _) => html! { <Login /> },
         // Redirect when trying to access any other route
         (_, None) => html! { <Redirect<Route> to={Route::Login} /> },
+        (
+            _,
+            Some(AuthData {
+                token: Token { expires_at, .. },
+                ..
+            }),
+        ) if expires_at <= Utc::now() => html! { <Redirect<Route> to={Route::Login} /> },
         // Authenticated Routes
         (Route::Home, _) => html! { <Home /> },
         (Route::Results, _) => html! { <Results /> },
@@ -31,6 +40,7 @@ pub fn app() -> Html {
         data: get_auth_data_from_local_storage(),
         cache: Cache::default(),
     });
+
     html! {
         <ContextProvider<AuthContext> context={auth_state}>
             <Router />

@@ -42,13 +42,11 @@ impl EventTableData {
 
 #[function_component(Events)]
 pub fn events() -> Html {
-    let results = use_results();
+    let results_state = use_results();
     let events_state = use_events();
 
-    match &*events_state {
-        Some(events) => {
-            let results = results.as_ref().unwrap();
-
+    match (&*events_state, &*results_state) {
+        (Some(events), Some(results)) => {
             let mut table_data = events
                 .iter()
                 .map(|event| EventTableData::from_parkrun_models(event, results))
@@ -59,7 +57,7 @@ pub fn events() -> Html {
                 <Table<EventTableData> data={table_data} />
             }
         }
-        None => {
+        _ => {
             html! {
                 <div> { "Loading..." } </div>
             }

@@ -129,7 +129,10 @@ pub fn stat_card(
         <div class="transform col-span-6 lg:col-span-3">
             <Card>
                 <div class="w-full">
-                   <div class="mt-3 text-3xl font-bold leading-8"> { format!("{} {}", emoji, value) } </div>
+                   <div class="mt-3 text-3xl font-bold leading-8 flex flex-col sm:flex-row">
+                    <div> { emoji } </div>
+                    <div class="mt-3 sm:mt-0 sm:ml-1"> { value } </div>
+                   </div>
                    <div class="mt-1 text-base text-gray-600 dark:text-white"> { title } </div>
                 </div>
             </Card>
@@ -157,13 +160,13 @@ pub fn home() -> Html {
                 <div class="p-8">
                     <div class="grid grid-cols-12 gap-6">
                         <StatCard emoji="🏃" title="Total runs" value={ results.len().to_string() } />
-                        <StatCard emoji="⏱" title="Average time" value={ duration_formatter(average_time(results)) } />
+                        <StatCard emoji="⏱" title="Avg time" value={ duration_formatter(average_time(results)) } />
                         <StatCard emoji="⏳" title="Total time" value={ format_total_time(total_time(results)) } />
                         <StatCard emoji="📍" title="Locations" value={ events(results).len().to_string() } />
                         <StatCard emoji="🚀" title="Fastest time" value={ duration_formatter(fastest_time(results)) } />
-                        <StatCard emoji="📅" title="Runs this year" value={ results.iter().filter(|result| result.date().year() ==  Local::now().year()).count().to_string() } />
+                        <StatCard emoji="📅" title="This year" value={ results.iter().filter(|result| result.date().year() ==  Local::now().year()).count().to_string() } />
                         <StatCard emoji="👪" title="Best position" value={ results.iter().map(|result| result.position()).min().unwrap().to_string() } />
-                        <StatCard emoji="⌚" title="Average min/km" value={ duration_formatter(average_speed(results)) } />
+                        <StatCard emoji="⌚" title="Avg min/km" value={ duration_formatter(average_speed(results)) } />
 
                         <div class="col-span-12 md:col-span-6">
                             <Card>
