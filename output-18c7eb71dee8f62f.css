@@ -714,6 +714,10 @@ video {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
+.flex-col {
+  flex-direction: column;
+}
+
 .items-center {
   align-items: center;
 }
@@ -1102,6 +1106,18 @@ video {
 }
 
 @media (min-width: 640px) {
+  .sm\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .sm\:ml-1 {
+    margin-left: 0.25rem;
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+
   .sm\:px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
