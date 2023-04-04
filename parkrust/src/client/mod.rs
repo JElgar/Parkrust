@@ -123,7 +123,7 @@ impl ParkrunClient {
             .json::<RefreshTokenResponse>()
             .await?;
 
-        println!("Refresh token response is: {:?}", response);
+        println!("Refresh token response is: {response:?}");
         Ok(Token {
             expires_at: Utc::now() + Duration::seconds(response.expires_in.into()),
             access_token: response.access_token,

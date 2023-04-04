@@ -17,13 +17,13 @@ use yew::prelude::*;
 pub fn calendar() -> Html {
     let results_state = use_results();
 
-    pub fn get_next_saturday(start_date: Date<Utc>) -> Date<Utc> {
+    pub fn get_next_saturday(start_date: NaiveDate) -> NaiveDate {
         let days_till_next_saturday = (7 - start_date.weekday().num_days_from_sunday() + 6) % 7;
         start_date + Duration::days(days_till_next_saturday as i64)
     }
 
-    fn get_saturdays_in_month(month: u32, year: i32) -> Vec<Date<Utc>> {
-        let first_day_of_month = Date::from_utc(NaiveDate::from_ymd(year, month, 1), Utc);
+    fn get_saturdays_in_month(month: u32, year: i32) -> Vec<NaiveDate> {
+        let first_day_of_month = NaiveDate::from_ymd_opt(year, month, 1).unwrap();
         let first_saturday = get_next_saturday(first_day_of_month);
 
         let mut saturdays = Vec::new();
@@ -35,7 +35,7 @@ pub fn calendar() -> Html {
         saturdays
     }
 
-    fn result_on_day(day: &Date<Utc>, results: &[RunResult]) -> Option<RunResult> {
+    fn result_on_day(day: &NaiveDate, results: &[RunResult]) -> Option<RunResult> {
         results.iter().find_map(|result| {
             if &result.date() == day {
                 Some(result.clone())
@@ -55,14 +55,14 @@ pub fn calendar() -> Html {
                             "bg-green-400"
                         },
                         None => {
-                            if day >= &Utc::now().date() {
-                                "dark:bg-slate-700"
+                            if day >= &Utc::now().naive_local().date() {
+                                "bg-white dark:bg-slate-700"
                             } else {
-                                "dark:bg-slate-500"
+                                "bg-slate-100 dark:bg-slate-500"
                             }
                         }
                     };
-                    format!("lg:m-1 p-1 w-10 bg-white rounded-lg shadow-md dark:border-gray-700 text-center {}", background_colors)
+                    format!("lg:m-1 p-1 w-10 rounded-lg shadow-md dark:border-gray-700 text-center {background_colors}")
                 };
 
                 html! {

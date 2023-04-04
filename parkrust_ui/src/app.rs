@@ -1,10 +1,10 @@
-use chrono::{Datelike, Utc};
+use chrono::Utc;
 use parkrust::client::Token;
 use parkrust_ui::services::parkrun::{
     get_auth_data_from_local_storage, AuthContext, AuthData, AuthState, Cache,
 };
 use yew::prelude::*;
-use yew_router::prelude::{use_navigator, Redirect};
+use yew_router::prelude::Redirect;
 use yew_router::{BrowserRouter, Switch};
 
 use parkrust_ui::{

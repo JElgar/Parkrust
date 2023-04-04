@@ -7,8 +7,8 @@ edition = "2021"
 parkrust = { path = "../parkrust" }
 parkrust_ui_derive = { path = "./parkrust_ui_derive" }
 
-yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
-yew-router = { git = "https://github.com/yewstack/yew.git" }
+yew = { version = "0.20", features = ["csr"] }
+yew-router = { version = "0.17" }
 wasm-bindgen-futures = "0.4.33"
 material-yew = { version = "0.2", features = ["full"] }
 web-sys = "0.3.60"

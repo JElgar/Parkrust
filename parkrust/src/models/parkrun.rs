@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{Date, Duration, NaiveDate, Utc};
+use chrono::{Duration, NaiveDate};
 use serde::{Deserialize, Serialize};
 use std::time::Duration as StdDuration;
 
@@ -113,7 +113,7 @@ pub struct RunResult {
     #[serde(rename(serialize = "GenuinePB", deserialize = "GenuinePB"))]
     pub genuine_pb: String, // Boolean
     pub updated: String,         // Date time
-    pub assisted: Option<bool>,  // Not sure?
+    pub assisted: Option<String>, // Not sure? "0" or probably "1"
 }
 
 impl RunResult {
@@ -130,9 +130,8 @@ impl RunResult {
         Duration::from_std(duration).unwrap()
     }
 
-    pub fn date(&self) -> Date<Utc> {
-        let naive_date = NaiveDate::parse_from_str(self.event_date.as_str(), "%Y-%m-%d").unwrap();
-        Date::from_utc(naive_date, Utc)
+    pub fn date(&self) -> NaiveDate {
+        NaiveDate::parse_from_str(self.event_date.as_str(), "%Y-%m-%d").unwrap()
     }
 
     pub fn position(&self) -> usize {

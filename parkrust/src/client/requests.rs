@@ -59,25 +59,25 @@ pub fn duration_formatter(duration: Duration) -> String {
     let hours = (duration.num_seconds() / 60) / 60;
 
     if hours == 0 {
-        format!("{:0>2}:{:0>2}", minutes, seconds)
+        format!("{minutes:0>2}:{seconds:0>2}")
     } else {
-        format!("{:0>2}:{:0>2}:{:0>2}", hours, minutes, seconds)
+        format!("{hours:0>2}:{minutes:0>2}:{seconds:0>2}")
     }
 }
 
-#[cfg(test)]
-mod tests {
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
-    use super::*;
-
-    macro_rules! duration_test {
-        ($name:ident, $input:expr, $expected:expr) => {
-            #[test]
-            fn $name() {
-                assert_eq!($expected, duration_formatter($input));
-            }
-        };
-    }
-
-    // duration_test!()
-}
+// #[cfg(test)]
+// mod tests {
+//     // Note this useful idiom: importing names from outer (for mod tests) scope.
+//
+//
+//     // macro_rules! duration_test {
+//     //     ($name:ident, $input:expr, $expected:expr) => {
+//     //         #[test]
+//     //         fn $name() {
+//     //             assert_eq!($expected, duration_formatter($input));
+//     //         }
+//     //     };
+//     // }
+//
+//     // duration_test!()
+// }

@@ -6,6 +6,10 @@ A UI for parkrun data.
 
 ## Development
 
+```
+trunk serve
+```
+
 ### Tailwind
 
 We should add some kind of target to do this but for now run

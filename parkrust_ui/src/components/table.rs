@@ -44,7 +44,7 @@ pub fn table_nav(
     }: &TableNavProps,
 ) -> Html {
     let base_css = "relative inline-flex items-center border border-gray-300 bg-white py-2 text-sm font-medium text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700";
-    let base_button_css = format!("{} px-2 hover:bg-gray-50 focus:z-20", base_css);
+    let base_button_css = format!("{base_css} px-2 hover:bg-gray-50 focus:z-20");
     html! {
             <div class="flex items-center justify-center mt-2">
                 <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
@@ -54,7 +54,7 @@ pub fn table_nav(
                         let set_page = setpage.clone();
                         Callback::from(move |_| if current_page > 1 { set_page.emit(current_page - 1) })
                     }
-                    class={format!("{} rounded-l-md", base_button_css)}
+                    class={format!("{base_button_css} rounded-l-md")}
                   >
                     <span class="sr-only"> { "Previous" } </span>
                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -63,7 +63,7 @@ pub fn table_nav(
                   </button>
 
                   <div
-                      class={format!("{} px-4", base_css)}> { format!("{}/{}", current_page, num_pages)}
+                      class={format!("{base_css} px-4")}> { format!("{current_page}/{num_pages}")}
                   </div>
 
                   <button
@@ -73,7 +73,7 @@ pub fn table_nav(
                         let set_page = setpage.clone();
                         Callback::from(move |_| if current_page < num_pages { set_page.emit(current_page + 1) })
                     }
-                    class={format!("{} rounded-r-md", base_button_css)}
+                    class={format!("{base_button_css} rounded-r-md")}
                   >
                     <span class="sr-only">{ "Next" } </span>
                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

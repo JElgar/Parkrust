@@ -1,10 +1,10 @@
-use parkrust::models::parkrun::{ RunResult, Event };
+use parkrust::models::parkrun::{Event, RunResult};
 use parkrust_ui_derive::table_data_type;
 
 use yew::prelude::*;
 
 use crate::components::Table;
-use crate::services::parkrun::{use_results, use_events};
+use crate::services::parkrun::{use_events, use_results};
 
 #[table_data_type()]
 pub struct ResultTableData {
@@ -40,7 +40,10 @@ pub fn results() -> Html {
             let table_data = results
                 .iter()
                 .map(|result| {
-                    let event = events.iter().find(|event| event.event_number == result.event_number).unwrap();
+                    let event = events
+                        .iter()
+                        .find(|event| event.event_number == result.event_number)
+                        .unwrap();
                     ResultTableData::from_parkrun_result(result, event)
                 })
                 .collect::<Vec<ResultTableData>>();
